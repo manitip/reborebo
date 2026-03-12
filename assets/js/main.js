@@ -345,9 +345,12 @@ const initRequestBuilder = () => {
   document.querySelectorAll('[data-add-to-request]').forEach((button) => {
     button.addEventListener('click', () => {
       const currentQty = getRequestQty(button.dataset.productName);
-      const nextQty = currentQty > 0 ? currentQty : 1;
+      if (currentQty > 0) {
+        window.location.href = 'contacts.html#request';
+        return;
+      }
 
-      upsertRequestItem(button.dataset.productName, nextQty);
+      upsertRequestItem(button.dataset.productName, 1);
       updateRequestVisualState();
       animateRequestStatus(button);
     });
