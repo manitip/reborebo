@@ -434,3 +434,14 @@ button,input,textarea,select{font:inherit}
   .section-head,.toolbar,.product-meta,.copyright,.timeline-item{flex-direction:column;align-items:flex-start}
   .timeline-item{grid-template-columns:1fr}
 }
+
+.request-builder{display:grid;gap:12px;padding:16px;border:1px solid var(--stroke);border-radius:18px;background:#fff}
+.request-builder-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.request-builder-head h3{margin:0;font-size:1.02rem}
+.request-items{display:grid;gap:10px}
+.request-item{display:grid;grid-template-columns:1fr 120px auto;gap:10px}
+.request-empty{margin:0;color:var(--muted);line-height:1.5}
+
+@media (max-width:680px){
+  .request-item{grid-template-columns:1fr}
+}
