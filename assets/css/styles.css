@@ -69,11 +69,11 @@ button,input,textarea,select{font:inherit}
 .navbar{
   min-height:84px;
   display:grid;
-  grid-template-columns:minmax(260px, auto) 1fr auto;
+  grid-template-columns:auto 1fr auto;
   align-items:center;
-  gap:18px;
+  gap:24px;
 }
-.logo{display:flex;align-items:center;gap:12px;font-weight:800;color:var(--text);letter-spacing:.02em}
+.logo{display:flex;align-items:center;gap:14px;font-weight:800;color:var(--text);letter-spacing:.02em}
 .logo-mark{
   width:46px;height:46px;border-radius:16px;
   display:grid;place-items:center;
@@ -81,16 +81,14 @@ button,input,textarea,select{font:inherit}
   box-shadow:0 12px 30px rgba(14,108,201,.26);
   color:#fff;
 }
-.logo span{display:block;line-height:1.06}
 .logo span small{display:block;color:var(--muted);font-size:.72rem;font-weight:600;letter-spacing:.08em;margin-top:3px;text-transform:uppercase}
-.nav-links{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:nowrap;min-width:0}
+.nav-links{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
 .nav-links a{
-  padding:10px 12px;border-radius:999px;color:var(--muted);font-weight:600;white-space:nowrap;
+  padding:11px 14px;border-radius:999px;color:var(--muted);font-weight:600;
   transition:var(--transition);
 }
 .nav-links a:hover,.nav-links a.active{background:#fff;color:var(--text);box-shadow:0 8px 18px rgba(23,50,78,.08)}
 .nav-actions{display:flex;align-items:center;gap:12px}
-.nav-actions .btn{white-space:nowrap}
 .mobile-toggle{
   display:none;width:46px;height:46px;border-radius:14px;border:1px solid var(--stroke);
   background:#fff;color:var(--text);box-shadow:var(--shadow)
@@ -322,10 +320,6 @@ button,input,textarea,select{font:inherit}
 .reveal{opacity:0;transform:translateY(18px);transition:.6s ease}
 .reveal.visible{opacity:1;transform:none}
 @media (max-width: 1140px){
-  .navbar{grid-template-columns:minmax(220px, auto) 1fr auto;gap:12px}
-  .logo span{font-size:.94rem}
-  .logo span small{font-size:.64rem;letter-spacing:.06em}
-  .nav-links a{padding:9px 9px;font-size:.92rem}
   .hero-shell,.page-hero-shell,.split-card,.catalog-shell,.contact-shell,.product-shell,.page-shell,.hero-grid{grid-template-columns:1fr}
   .sidebar{position:static}
   .grid-4,.process,.stats-band,.mini-metrics{grid-template-columns:repeat(2,1fr)}
