@@ -83,7 +83,7 @@
         <article class="card contact-card reveal" id="request">
           <span class="eyebrow">Отправить запрос</span>
           <h2 style="margin:14px 0 12px;font-size:2rem;line-height:1.08">Коммерческое предложение под вашу задачу</h2>
-          <form class="form-grid">
+          <form class="form-grid" data-request-form>
             <div class="grid-2">
               <input type="text" placeholder="Название компании">
               <input type="text" placeholder="Контактное лицо">
@@ -100,7 +100,18 @@
               <option>Автоматизация / роботизация</option>
               <option>Оснастка и инженерный проект</option>
             </select>
-            <textarea placeholder="Опишите задачу: перечень позиций, металл, способ сварки, объёмы, требуемые сроки или параметры проекта"></textarea>
+
+            <div class="request-builder" data-request-builder>
+              <div class="request-builder-head">
+                <h3>Позиции в заявке</h3>
+                <button class="btn btn-secondary btn-sm" type="button" data-request-add-empty>Добавить позицию</button>
+              </div>
+              <div class="request-items" data-request-items></div>
+              <p class="request-empty" data-request-empty>Пока нет добавленных товаров. Добавьте их из карточек каталога или вручную.</p>
+            </div>
+
+            <textarea data-request-message placeholder="Опишите задачу: перечень позиций, металл, способ сварки, объёмы, требуемые сроки или параметры проекта"></textarea>
+            <textarea data-request-summary hidden></textarea>
             <button class="btn btn-primary" type="button">Отправить запрос</button>
             <div class="form-note">Можно приложить к письму спецификацию или ведомость позиций и направить её на e-mail отдела продаж.</div>
           </form>
