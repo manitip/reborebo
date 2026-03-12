@@ -110,6 +110,36 @@ const setRequestItems = (items) => {
   localStorage.setItem(requestStorageKey, JSON.stringify(items));
 };
 
+const getRequestQty = (name = '') => {
+  const item = getRequestItems().find((entry) => normalizeProductName(entry.name) === normalizeProductName(name));
+  return item ? Math.max(0, Number(item.qty) || 0) : 0;
+};
+
+const upsertRequestItem = (name, qty) => {
+  const normalizedName = (name || '').trim();
+  if (!normalizedName) return;
+
+  const normalizedQty = Math.max(0, Number(qty) || 0);
+  const items = getRequestItems();
+  const index = items.findIndex((item) => normalizeProductName(item.name) === normalizeProductName(normalizedName));
+
+  if (normalizedQty === 0) {
+    if (index >= 0) {
+      items.splice(index, 1);
+    }
+    setRequestItems(items);
+    return;
+  }
+
+  if (index >= 0) {
+    items[index].qty = normalizedQty;
+  } else {
+    items.push({ name: normalizedName, qty: normalizedQty });
+  }
+
+  setRequestItems(items);
+};
+
 const animateRequestStatus = (button) => {
   button.classList.remove('added-burst');
   requestAnimationFrame(() => button.classList.add('added-burst'));
@@ -121,42 +151,131 @@ const animateRequestStatus = (button) => {
   }
 };
 
+const ensureQtyPopover = (button, onChange) => {
+  const card = button.closest('.product-card, .product-detail');
+  if (!card) return null;
+
+  let popover = card.querySelector(`[data-request-qty-popover="${button.dataset.productName}"]`);
+  if (popover) return popover;
+
+  popover = document.createElement('div');
+  popover.className = 'request-qty-popover';
+  popover.dataset.requestQtyPopover = button.dataset.productName;
+  popover.hidden = true;
+
+  const minusButton = document.createElement('button');
+  minusButton.type = 'button';
+  minusButton.className = 'qty-arrow';
+  minusButton.setAttribute('aria-label', 'Уменьшить количество');
+  minusButton.textContent = '−';
+
+  const qtyInput = document.createElement('input');
+  qtyInput.type = 'number';
+  qtyInput.min = '0';
+  qtyInput.step = '1';
+  qtyInput.value = '1';
+  qtyInput.className = 'qty-input';
+
+  const plusButton = document.createElement('button');
+  plusButton.type = 'button';
+  plusButton.className = 'qty-arrow';
+  plusButton.setAttribute('aria-label', 'Увеличить количество');
+  plusButton.textContent = '+';
+
+  minusButton.addEventListener('click', () => {
+    const current = Math.max(0, Number(qtyInput.value) || 0);
+    const next = Math.max(0, current - 1);
+    qtyInput.value = String(next);
+    onChange(next);
+  });
+
+  plusButton.addEventListener('click', () => {
+    const current = Math.max(0, Number(qtyInput.value) || 0);
+    const next = current + 1;
+    qtyInput.value = String(next);
+    onChange(next);
+  });
+
+  qtyInput.addEventListener('input', () => {
+    const next = Math.max(0, Number(qtyInput.value) || 0);
+    onChange(next);
+  });
+
+  popover.append(minusButton, qtyInput, plusButton);
+
+  const buttonRow = button.parentElement;
+  if (buttonRow && buttonRow.classList.contains('badge-line')) {
+    buttonRow.after(popover);
+  } else {
+    button.after(popover);
+  }
+
+  return popover;
+};
+
+const setPopoverVisibility = (popover, isVisible, qty = 1) => {
+  if (!popover) return;
+
+  const qtyInput = popover.querySelector('.qty-input');
+  if (qtyInput) {
+    qtyInput.value = String(Math.max(0, Number(qty) || 0));
+  }
+
+  const currentlyVisible = popover.dataset.visible === 'true';
+
+  if (isVisible) {
+    if (!currentlyVisible) {
+      popover.hidden = false;
+      popover.classList.remove('qty-pop-out');
+      popover.classList.remove('qty-pop-in');
+      requestAnimationFrame(() => popover.classList.add('qty-pop-in'));
+    }
+    popover.dataset.visible = 'true';
+  } else {
+    if (!currentlyVisible) {
+      popover.hidden = true;
+      return;
+    }
+    popover.classList.remove('qty-pop-in');
+    popover.classList.add('qty-pop-out');
+    popover.dataset.visible = 'false';
+    setTimeout(() => {
+      popover.hidden = true;
+      popover.classList.remove('qty-pop-out');
+    }, 220);
+  }
+};
+
 const updateRequestVisualState = () => {
   const items = getRequestItems();
-  const hasProduct = (name = '') => items.some((item) => normalizeProductName(item.name) === normalizeProductName(name));
+  const getQty = (name = '') => {
+    const found = items.find((item) => normalizeProductName(item.name) === normalizeProductName(name));
+    return found ? Math.max(0, Number(found.qty) || 0) : 0;
+  };
 
   document.querySelectorAll('[data-add-to-request]').forEach((button) => {
     if (!button.dataset.defaultLabel) {
       button.dataset.defaultLabel = button.textContent.trim();
     }
 
-    const added = hasProduct(button.dataset.productName);
+    const qty = getQty(button.dataset.productName);
+    const added = qty > 0;
+
     button.classList.toggle('is-added', added);
     button.setAttribute('aria-pressed', String(added));
-    button.textContent = added ? 'Добавлено ✓' : button.dataset.defaultLabel;
+    button.textContent = added ? `В заявке: ${qty}` : button.dataset.defaultLabel;
 
     const card = button.closest('.product-card, .product-detail');
     if (card) {
       card.classList.toggle('in-request', added);
     }
+
+    const popover = ensureQtyPopover(button, (nextQty) => {
+      upsertRequestItem(button.dataset.productName, nextQty);
+      updateRequestVisualState();
+    });
+    setPopoverVisibility(popover, added, added ? qty : 1);
   });
-};
-
-const addRequestItem = (name, qty = 1) => {
-  const normalizedName = (name || '').trim();
-  if (!normalizedName) return;
-
-  const normalizedQty = Math.max(1, Number(qty) || 1);
-  const items = getRequestItems();
-  const existingItem = items.find((item) => normalizeProductName(item.name) === normalizeProductName(normalizedName));
-
-  if (existingItem) {
-    existingItem.qty += normalizedQty;
-  } else {
-    items.push({ name: normalizedName, qty: normalizedQty });
-  }
-
-  setRequestItems(items);
 };
 
 const createRequestRow = (item, index, onUpdate) => {
@@ -170,7 +289,7 @@ const createRequestRow = (item, index, onUpdate) => {
 
   const qtyInput = document.createElement('input');
   qtyInput.type = 'number';
-  qtyInput.min = '1';
+  qtyInput.min = '0';
   qtyInput.step = '1';
   qtyInput.value = String(item.qty || 1);
   qtyInput.placeholder = 'Кол-во';
@@ -184,7 +303,7 @@ const createRequestRow = (item, index, onUpdate) => {
     onUpdate(index, {
       ...item,
       name: nameInput.value.trim(),
-      qty: Math.max(1, Number(qtyInput.value) || 1),
+      qty: Math.max(0, Number(qtyInput.value) || 0),
     });
   });
 
@@ -192,7 +311,7 @@ const createRequestRow = (item, index, onUpdate) => {
     onUpdate(index, {
       ...item,
       name: nameInput.value.trim(),
-      qty: Math.max(1, Number(qtyInput.value) || 1),
+      qty: Math.max(0, Number(qtyInput.value) || 0),
     });
   });
 
@@ -207,15 +326,12 @@ const createRequestRow = (item, index, onUpdate) => {
 const initRequestBuilder = () => {
   document.querySelectorAll('[data-add-to-request]').forEach((button) => {
     button.addEventListener('click', () => {
-      addRequestItem(button.dataset.productName, button.dataset.productQty);
+      const currentQty = getRequestQty(button.dataset.productName);
+      const nextQty = currentQty > 0 ? currentQty : 1;
+
+      upsertRequestItem(button.dataset.productName, nextQty);
       updateRequestVisualState();
       animateRequestStatus(button);
-
-      if (button.dataset.addMode === 'redirect') {
-        setTimeout(() => {
-          window.location.href = 'contacts.html#request';
-        }, 320);
-      }
     });
   });
 
@@ -234,9 +350,9 @@ const initRequestBuilder = () => {
     const filteredItems = nextItems
       .map((item) => ({
         name: (item.name || '').trim(),
-        qty: Math.max(1, Number(item.qty) || 1),
+        qty: Math.max(0, Number(item.qty) || 0),
       }))
-      .filter((item) => item.name);
+      .filter((item) => item.name && item.qty > 0);
 
     setRequestItems(filteredItems);
 
