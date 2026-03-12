@@ -92,3 +92,146 @@ if(animatedCounters.length){
 
   animatedCounters.forEach((counter)=>counterObserver.observe(counter));
 }
+
+const requestStorageKey = 'comtrade_request_items';
+
+const getRequestItems = () => {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(requestStorageKey) || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const setRequestItems = (items) => {
+  localStorage.setItem(requestStorageKey, JSON.stringify(items));
+};
+
+const addRequestItem = (name, qty = 1) => {
+  const normalizedName = (name || '').trim();
+  if (!normalizedName) return;
+
+  const normalizedQty = Math.max(1, Number(qty) || 1);
+  const items = getRequestItems();
+  const existingItem = items.find((item) => item.name === normalizedName);
+
+  if (existingItem) {
+    existingItem.qty += normalizedQty;
+  } else {
+    items.push({ name: normalizedName, qty: normalizedQty });
+  }
+
+  setRequestItems(items);
+};
+
+const createRequestRow = (item, index, onUpdate) => {
+  const row = document.createElement('div');
+  row.className = 'request-item';
+
+  const nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.value = item.name;
+  nameInput.placeholder = 'Наименование товара';
+
+  const qtyInput = document.createElement('input');
+  qtyInput.type = 'number';
+  qtyInput.min = '1';
+  qtyInput.step = '1';
+  qtyInput.value = String(item.qty || 1);
+  qtyInput.placeholder = 'Кол-во';
+
+  const removeButton = document.createElement('button');
+  removeButton.type = 'button';
+  removeButton.className = 'btn btn-secondary btn-sm';
+  removeButton.textContent = 'Удалить';
+
+  nameInput.addEventListener('input', () => {
+    onUpdate(index, {
+      ...item,
+      name: nameInput.value.trim(),
+      qty: Math.max(1, Number(qtyInput.value) || 1),
+    });
+  });
+
+  qtyInput.addEventListener('input', () => {
+    onUpdate(index, {
+      ...item,
+      name: nameInput.value.trim(),
+      qty: Math.max(1, Number(qtyInput.value) || 1),
+    });
+  });
+
+  removeButton.addEventListener('click', () => {
+    onUpdate(index, null);
+  });
+
+  row.append(nameInput, qtyInput, removeButton);
+  return row;
+};
+
+const initRequestBuilder = () => {
+  document.querySelectorAll('[data-add-to-request]').forEach((button) => {
+    button.addEventListener('click', () => {
+      addRequestItem(button.dataset.productName, button.dataset.productQty);
+      if (button.dataset.addMode === 'redirect') {
+        window.location.href = 'contacts.html#request';
+      }
+    });
+  });
+
+  const form = document.querySelector('[data-request-form]');
+  if (!form) return;
+
+  const itemsContainer = form.querySelector('[data-request-items]');
+  const emptyState = form.querySelector('[data-request-empty]');
+  const addEmptyButton = form.querySelector('[data-request-add-empty]');
+  const summaryField = form.querySelector('[data-request-summary]');
+  const messageField = form.querySelector('[data-request-message]');
+
+  const persistAndRender = (nextItems) => {
+    const filteredItems = nextItems
+      .map((item) => ({
+        name: (item.name || '').trim(),
+        qty: Math.max(1, Number(item.qty) || 1),
+      }))
+      .filter((item) => item.name);
+
+    setRequestItems(filteredItems);
+
+    itemsContainer.innerHTML = '';
+    filteredItems.forEach((item, index) => {
+      const row = createRequestRow(item, index, (targetIndex, updatedItem) => {
+        const draftItems = getRequestItems();
+        if (updatedItem === null) {
+          draftItems.splice(targetIndex, 1);
+        } else {
+          draftItems[targetIndex] = updatedItem;
+        }
+        persistAndRender(draftItems);
+      });
+      itemsContainer.append(row);
+    });
+
+    const hasItems = filteredItems.length > 0;
+    emptyState.hidden = hasItems;
+    const summaryText = hasItems
+      ? filteredItems.map((item, idx) => `${idx + 1}. ${item.name} — ${item.qty} шт.`).join('\n')
+      : '';
+
+    summaryField.value = summaryText;
+    if (summaryText && messageField && !messageField.value.trim()) {
+      messageField.value = `Позиции в заявке:\n${summaryText}`;
+    }
+  };
+
+  addEmptyButton.addEventListener('click', () => {
+    const draftItems = getRequestItems();
+    draftItems.push({ name: '', qty: 1 });
+    persistAndRender(draftItems);
+  });
+
+  persistAndRender(getRequestItems());
+};
+
+initRequestBuilder();
