@@ -19,24 +19,24 @@ const categoryGrid = document.querySelector('.category-grid');
 const filterButtons = Array.from(document.querySelectorAll('[data-filter]'));
 const categoryNavigation = document.querySelector('[data-category-nav]');
 
-const syncCategoryTiles = (target = 'all') => {
+const syncCategoryTiles = (target = 'all', selectedTile = null) => {
   if (!categoryNavigation) return;
 
   const tiles = Array.from(categoryNavigation.querySelectorAll('[data-category-link]'));
   const exactMatch = tiles.find((tile)=>tile.dataset.filterTarget === target);
-  const activeTile = exactMatch || tiles.find((tile)=>tile.dataset.filterTarget === 'all');
+  const activeTile = selectedTile || exactMatch || tiles.find((tile)=>tile.dataset.filterTarget === 'all');
 
   tiles.forEach((tile)=>tile.classList.toggle('active', tile === activeTile));
 };
 
 const applyCatalogFilter = (target = 'all', options = {}) => {
-  const { animate = false } = options;
+  const { animate = false, selectedTile = null } = options;
   const nextTarget = target || 'all';
 
   filterButtons.forEach((item)=>{
     item.classList.toggle('active', item.dataset.filter === nextTarget);
   });
-  syncCategoryTiles(nextTarget);
+  syncCategoryTiles(nextTarget, selectedTile);
 
   if (categoryGrid && animate) {
     categoryGrid.classList.add('is-switching');
@@ -73,8 +73,11 @@ if (categoryNavigation) {
       const target = tile.dataset.filterTarget || 'all';
       const scrollTarget = tile.dataset.scrollTarget;
 
-      tile.classList.add('active');
-      applyCatalogFilter(target, { animate: true });
+      tile.classList.remove('is-pressed');
+      requestAnimationFrame(() => tile.classList.add('is-pressed'));
+      setTimeout(() => tile.classList.remove('is-pressed'), 420);
+
+      applyCatalogFilter(target, { animate: true, selectedTile: tile });
 
       if (scrollTarget) {
         const destination = document.getElementById(scrollTarget);
