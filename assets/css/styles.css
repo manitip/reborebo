@@ -235,12 +235,15 @@ button,input,textarea,select{font:inherit}
 .checkbox-list label{display:flex;gap:10px;align-items:flex-start;color:var(--muted);line-height:1.45}
 .checkbox-list input{margin-top:4px}
 .toolbar{
-  display:flex;justify-content:space-between;align-items:center;gap:16px;
-  padding:18px 20px;border-radius:20px;background:#fff;border:1px solid var(--stroke);box-shadow:var(--shadow)
+  display:block;padding:0;background:none;border:none;box-shadow:none
+}
+.toolbar-cell{
+  display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:16px 18px;border-radius:24px;
+  background:linear-gradient(180deg,#ffffff,#f8fbff);border:1px solid #d4e2f0;box-shadow:var(--shadow)
 }
 .search{
   display:flex;align-items:center;gap:10px;flex:1;background:var(--surface-2);
-  border:1px solid var(--stroke);border-radius:16px;min-height:52px;padding:0 14px
+  border:1px solid #cfdcec;border-radius:16px;min-height:52px;padding:0 14px
 }
 .search input{background:none;border:none;outline:none;width:100%}
 .product-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
@@ -392,9 +395,9 @@ button,input,textarea,select{font:inherit}
 .mini-metric{padding:16px;border-radius:18px;background:#fff;border:1px solid var(--stroke)}
 .mini-metric strong{display:block;font-size:1.35rem}
 .mini-metric span{display:block;color:var(--muted);margin-top:4px;font-size:.92rem;line-height:1.5}
-.tabs{display:flex;flex-wrap:wrap;gap:10px}
-.tabs a{padding:11px 14px;border-radius:999px;background:#fff;border:1px solid var(--stroke);color:var(--muted);font-weight:700}
-.tabs a.active{background:var(--accent-soft);border-color:#cfe1f5;color:var(--accent-dark)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px}
+.tabs a{padding:11px 15px;border-radius:999px;background:#fff;border:1px solid #ccdced;color:#4d637b;font-weight:700}
+.tabs a.active{background:linear-gradient(180deg,#e8f1fd,#d8e8fb);border-color:#bcd2ea;color:var(--accent-dark)}
 .catalog-assortment-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 .assortment-tile{
   position:relative;overflow:hidden;display:flex;align-items:center;gap:12px;width:100%;padding:16px 14px;border-radius:18px;
@@ -467,7 +470,7 @@ button,input,textarea,select{font:inherit}
   .nav-actions .btn-secondary{display:none}
   .metric-grid,.grid-2,.grid-3,.grid-4,.grid-5,.stats-band,.product-grid,.project-grid,.news-grid,.brand-grid,.footer-grid,.process,.mini-metrics,.thumb-grid{grid-template-columns:1fr}
   .catalog-assortment-nav{grid-template-columns:1fr}
-  .section-head,.toolbar,.product-meta,.copyright,.timeline-item{flex-direction:column;align-items:flex-start}
+  .section-head,.toolbar-cell,.product-meta,.copyright,.timeline-item{flex-direction:column;align-items:flex-start}
   .timeline-item{grid-template-columns:1fr}
 }
 
