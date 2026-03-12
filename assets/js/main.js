@@ -15,20 +15,79 @@ const observer = new IntersectionObserver((entries)=>{
 },{threshold:.12});
 document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 
-document.querySelectorAll('[data-filter]').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    const group = btn.closest('.tabs');
-    if(group){
-      group.querySelectorAll('[data-filter]').forEach(item=>item.classList.remove('active'));
-    }
-    btn.classList.add('active');
-    const target = btn.dataset.filter;
-    document.querySelectorAll('[data-filter-item]').forEach(card=>{
+const categoryGrid = document.querySelector('.category-grid');
+const filterButtons = Array.from(document.querySelectorAll('[data-filter]'));
+const categoryNavigation = document.querySelector('[data-category-nav]');
+
+const syncCategoryTiles = (target = 'all', selectedTile = null) => {
+  if (!categoryNavigation) return;
+
+  const tiles = Array.from(categoryNavigation.querySelectorAll('[data-category-link]'));
+  const exactMatch = tiles.find((tile)=>tile.dataset.filterTarget === target);
+  const activeTile = selectedTile || exactMatch || tiles.find((tile)=>tile.dataset.filterTarget === 'all');
+
+  tiles.forEach((tile)=>tile.classList.toggle('active', tile === activeTile));
+};
+
+const applyCatalogFilter = (target = 'all', options = {}) => {
+  const { animate = false, selectedTile = null } = options;
+  const nextTarget = target || 'all';
+
+  filterButtons.forEach((item)=>{
+    item.classList.toggle('active', item.dataset.filter === nextTarget);
+  });
+  syncCategoryTiles(nextTarget, selectedTile);
+
+  if (categoryGrid && animate) {
+    categoryGrid.classList.add('is-switching');
+  }
+
+  const applyVisibility = () => {
+    document.querySelectorAll('[data-filter-item]').forEach((card)=>{
       const values = (card.dataset.filterItem || '').split(' ');
-      card.style.display = (target === 'all' || values.includes(target)) ? '' : 'none';
+      card.style.display = (nextTarget === 'all' || values.includes(nextTarget)) ? '' : 'none';
     });
+
+    if (categoryGrid && animate) {
+      requestAnimationFrame(() => categoryGrid.classList.remove('is-switching'));
+    }
+  };
+
+  if (categoryGrid && animate) {
+    setTimeout(applyVisibility, 160);
+  } else {
+    applyVisibility();
+  }
+};
+
+filterButtons.forEach((btn)=>{
+  btn.addEventListener('click', ()=>{
+    const target = btn.dataset.filter || 'all';
+    applyCatalogFilter(target, { animate: true });
   });
 });
+
+if (categoryNavigation) {
+  categoryNavigation.querySelectorAll('[data-category-link]').forEach((tile)=>{
+    tile.addEventListener('click', ()=>{
+      const target = tile.dataset.filterTarget || 'all';
+      const scrollTarget = tile.dataset.scrollTarget;
+
+      tile.classList.remove('is-pressed');
+      requestAnimationFrame(() => tile.classList.add('is-pressed'));
+      setTimeout(() => tile.classList.remove('is-pressed'), 420);
+
+      applyCatalogFilter(target, { animate: true, selectedTile: tile });
+
+      if (scrollTarget) {
+        const destination = document.getElementById(scrollTarget);
+        if (destination) {
+          setTimeout(()=>destination.scrollIntoView({ behavior: 'smooth', block: 'start' }), 190);
+        }
+      }
+    });
+  });
+}
 
 const searchInput = document.querySelector('[data-search]');
 if(searchInput){
