@@ -95,6 +95,8 @@ if(animatedCounters.length){
 
 const requestStorageKey = 'comtrade_request_items';
 
+const normalizeProductName = (value = '') => value.trim().toLowerCase();
+
 const getRequestItems = () => {
   try {
     const parsed = JSON.parse(localStorage.getItem(requestStorageKey) || '[]');
@@ -108,13 +110,45 @@ const setRequestItems = (items) => {
   localStorage.setItem(requestStorageKey, JSON.stringify(items));
 };
 
+const animateRequestStatus = (button) => {
+  button.classList.remove('added-burst');
+  requestAnimationFrame(() => button.classList.add('added-burst'));
+
+  const card = button.closest('.product-card, .product-detail');
+  if (card) {
+    card.classList.remove('status-flash');
+    requestAnimationFrame(() => card.classList.add('status-flash'));
+  }
+};
+
+const updateRequestVisualState = () => {
+  const items = getRequestItems();
+  const hasProduct = (name = '') => items.some((item) => normalizeProductName(item.name) === normalizeProductName(name));
+
+  document.querySelectorAll('[data-add-to-request]').forEach((button) => {
+    if (!button.dataset.defaultLabel) {
+      button.dataset.defaultLabel = button.textContent.trim();
+    }
+
+    const added = hasProduct(button.dataset.productName);
+    button.classList.toggle('is-added', added);
+    button.setAttribute('aria-pressed', String(added));
+    button.textContent = added ? 'Добавлено ✓' : button.dataset.defaultLabel;
+
+    const card = button.closest('.product-card, .product-detail');
+    if (card) {
+      card.classList.toggle('in-request', added);
+    }
+  });
+};
+
 const addRequestItem = (name, qty = 1) => {
   const normalizedName = (name || '').trim();
   if (!normalizedName) return;
 
   const normalizedQty = Math.max(1, Number(qty) || 1);
   const items = getRequestItems();
-  const existingItem = items.find((item) => item.name === normalizedName);
+  const existingItem = items.find((item) => normalizeProductName(item.name) === normalizeProductName(normalizedName));
 
   if (existingItem) {
     existingItem.qty += normalizedQty;
@@ -174,11 +208,18 @@ const initRequestBuilder = () => {
   document.querySelectorAll('[data-add-to-request]').forEach((button) => {
     button.addEventListener('click', () => {
       addRequestItem(button.dataset.productName, button.dataset.productQty);
+      updateRequestVisualState();
+      animateRequestStatus(button);
+
       if (button.dataset.addMode === 'redirect') {
-        window.location.href = 'contacts.html#request';
+        setTimeout(() => {
+          window.location.href = 'contacts.html#request';
+        }, 320);
       }
     });
   });
+
+  updateRequestVisualState();
 
   const form = document.querySelector('[data-request-form]');
   if (!form) return;
@@ -223,6 +264,8 @@ const initRequestBuilder = () => {
     if (summaryText && messageField && !messageField.value.trim()) {
       messageField.value = `Позиции в заявке:\n${summaryText}`;
     }
+
+    updateRequestVisualState();
   };
 
   addEmptyButton.addEventListener('click', () => {
