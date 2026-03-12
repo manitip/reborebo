@@ -218,7 +218,7 @@ button,input,textarea,select{font:inherit}
 }
 .page-hero-main{padding:38px;background:linear-gradient(180deg,#fff,#f8fbff)}
 .page-hero-aside{padding:24px;background:linear-gradient(180deg,#fff,#f4f9ff)}
-.kpi-list{display:grid;gap:12px;margin-top:14px}
+.kpi-list{display:grid;gap:12px;margin-top:16px}
 .kpi-item{display:flex;justify-content:space-between;gap:16px;padding:14px 16px;border-radius:16px;background:#fff;border:1px solid var(--stroke)}
 .kpi-item span{color:var(--muted)}
 .kpi-item strong{font-size:.94rem}
