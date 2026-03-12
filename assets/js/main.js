@@ -53,3 +53,42 @@ document.querySelectorAll('.accordion').forEach(box=>{
     });
   }
 });
+
+const animatedCounters = document.querySelectorAll('.metric strong[data-counter]');
+if(animatedCounters.length){
+  const formatCounterValue = (value, suffix='') => `${value}${suffix}`;
+  const animateCounter = (el)=>{
+    if(el.dataset.animated === 'true') return;
+    el.dataset.animated = 'true';
+    const target = Number(el.dataset.counter || 0);
+    const suffix = el.dataset.suffix || '';
+    const duration = 1300;
+    const start = performance.now();
+
+    const tick = (now)=>{
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(target * eased);
+      el.textContent = formatCounterValue(current, suffix);
+      if(progress < 1){
+        requestAnimationFrame(tick);
+      }else{
+        el.textContent = formatCounterValue(target, suffix);
+        el.classList.add('counter-ready');
+      }
+    };
+
+    requestAnimationFrame(tick);
+  };
+
+  const counterObserver = new IntersectionObserver((entries)=>{
+    entries.forEach((entry)=>{
+      if(entry.isIntersecting){
+        animateCounter(entry.target);
+        counterObserver.unobserve(entry.target);
+      }
+    });
+  }, {threshold:.45});
+
+  animatedCounters.forEach((counter)=>counterObserver.observe(counter));
+}

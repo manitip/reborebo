@@ -140,7 +140,7 @@ button,input,textarea,select{font:inherit}
 .hero-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-items:start}
 .hero h1:not(.hero-title),.page-hero h1{font-size:clamp(2rem,3.8vw,3.9rem);line-height:1.04;margin:16px 0 14px;letter-spacing:-.032em}
 .hero-title{
-  font-size:clamp(1.4rem,2.1vw,2.2rem);
+  font-size:clamp(1.55rem,2.45vw,2.55rem);
   line-height:1.08;
   letter-spacing:-.024em;
   font-weight:800;
@@ -157,6 +157,23 @@ button,input,textarea,select{font:inherit}
 .metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
 .metric{padding:18px;border-radius:20px;background:var(--surface-2);border:1px solid var(--stroke)}
 .metric strong{display:block;font-size:1.8rem;line-height:1;margin-bottom:8px}
+.metric strong[data-counter]{
+  background:linear-gradient(120deg,#0d4f8d,#1f7fd8);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  animation:metric-glow 2.4s ease-in-out infinite;
+}
+.metric strong.counter-ready{animation:metric-pop .55s ease-out both, metric-glow 2.4s ease-in-out infinite .55s}
+@keyframes metric-pop{
+  0%{transform:translateY(8px) scale(.92);opacity:.4}
+  65%{transform:translateY(0) scale(1.08);opacity:1}
+  100%{transform:translateY(0) scale(1)}
+}
+@keyframes metric-glow{
+  0%,100%{filter:drop-shadow(0 0 0 rgba(14,108,201,0))}
+  50%{filter:drop-shadow(0 6px 10px rgba(14,108,201,.28))}
+}
 .metric span{display:block;color:var(--muted);line-height:1.55;font-size:.94rem}
 .hero-card{padding:28px;background:linear-gradient(160deg,#17324e,#0c4d8c);color:#fff;border:1px solid rgba(255,255,255,.07);display:flex;flex-direction:column;justify-content:flex-start;gap:10px}
 .hero-card p,.hero-card li{color:rgba(255,255,255,.78)}
