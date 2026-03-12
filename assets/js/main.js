@@ -213,7 +213,13 @@ const ensureQtyPopover = (button, onChange) => {
   return popover;
 };
 
-const setPopoverVisibility = (popover, isVisible, qty = 1) => {
+const getQtyPopover = (button) => {
+  const card = button.closest('.product-card, .product-detail');
+  if (!card) return null;
+  return card.querySelector(`[data-request-qty-popover="${button.dataset.productName}"]`);
+};
+
+const setPopoverVisibility = (popover, isVisible, qty = 1, removeOnHide = false) => {
   if (!popover) return;
 
   const qtyInput = popover.querySelector('.qty-input');
@@ -234,6 +240,9 @@ const setPopoverVisibility = (popover, isVisible, qty = 1) => {
   } else {
     if (!currentlyVisible) {
       popover.hidden = true;
+      if (removeOnHide) {
+        popover.remove();
+      }
       return;
     }
     popover.classList.remove('qty-pop-in');
@@ -242,6 +251,9 @@ const setPopoverVisibility = (popover, isVisible, qty = 1) => {
     setTimeout(() => {
       popover.hidden = true;
       popover.classList.remove('qty-pop-out');
+      if (removeOnHide) {
+        popover.remove();
+      }
     }, 220);
   }
 };
@@ -270,11 +282,17 @@ const updateRequestVisualState = () => {
       card.classList.toggle('in-request', added);
     }
 
-    const popover = ensureQtyPopover(button, (nextQty) => {
-      upsertRequestItem(button.dataset.productName, nextQty);
-      updateRequestVisualState();
-    });
-    setPopoverVisibility(popover, added, added ? qty : 1);
+    const existingPopover = getQtyPopover(button);
+
+    if (added) {
+      const popover = existingPopover || ensureQtyPopover(button, (nextQty) => {
+        upsertRequestItem(button.dataset.productName, nextQty);
+        updateRequestVisualState();
+      });
+      setPopoverVisibility(popover, true, qty);
+    } else if (existingPopover) {
+      setPopoverVisibility(existingPopover, false, 1, true);
+    }
   });
 };
 
