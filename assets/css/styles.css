@@ -83,7 +83,7 @@ button,input,textarea,select{font:inherit}
 }
 .logo span{display:block;line-height:1.06}
 .logo span small{display:block;color:var(--muted);font-size:.72rem;font-weight:600;letter-spacing:.08em;margin-top:3px;text-transform:uppercase}
-.nav-links{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:nowrap;min-width:0}
+.nav-links{display:flex;column-gap:8px;row-gap:4px;align-items:center;justify-content:center;flex-wrap:wrap}
 .nav-links a{
   padding:10px 12px;border-radius:999px;color:var(--muted);font-weight:600;white-space:nowrap;
   transition:var(--transition);
