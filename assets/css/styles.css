@@ -198,6 +198,26 @@ button,input,textarea,select{font:inherit}
   margin-bottom:16px;background:linear-gradient(135deg,rgba(14,108,201,.12),rgba(243,106,33,.14));
   border:1px solid var(--stroke)
 }
+
+.category-grid{gap:14px}
+.category-card{padding:16px;border-radius:18px}
+.category-card h3{font-size:1.02rem;margin-bottom:8px;line-height:1.25}
+.category-card p{font-size:.9rem;line-height:1.5}
+.category-card .icon-badge{
+  width:34px;height:34px;border-radius:11px;margin-bottom:10px
+}
+.category-card .icon-badge svg{width:16px;height:16px}
+.category-points{display:grid;gap:8px;margin:10px 0 0;padding:0}
+.category-points li{
+  list-style:none;padding:8px 10px 8px 20px;border:1px solid var(--stroke);border-radius:12px;
+  background:#fff;color:var(--muted);font-size:.85rem;line-height:1.35;position:relative
+}
+.category-points li::before{
+  content:"";position:absolute;left:10px;top:14px;width:5px;height:5px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--warm))
+}
+.category-action{margin-top:10px}
+.category-card .btn{padding:8px 12px;font-size:.78rem}
 .stats-band{
   display:grid;grid-template-columns:repeat(4,1fr);gap:16px
 }
@@ -395,6 +415,8 @@ button,input,textarea,select{font:inherit}
   .grid-4,.process,.stats-band,.mini-metrics{grid-template-columns:repeat(2,1fr)}
   .grid-5{grid-template-columns:repeat(3,1fr)}
   .project-grid,.news-grid,.brand-grid,.grid-3{grid-template-columns:repeat(2,1fr)}
+  .category-grid{gap:12px}
+  .category-card{padding:14px}
   .footer-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width: 860px){
