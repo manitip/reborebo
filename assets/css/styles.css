@@ -83,12 +83,22 @@ button,input,textarea,select{font:inherit}
 }
 .logo span{display:block;line-height:1.06}
 .logo span small{display:block;color:var(--muted);font-size:.72rem;font-weight:600;letter-spacing:.08em;margin-top:3px;text-transform:uppercase}
-.nav-links{display:flex;column-gap:8px;row-gap:4px;align-items:center;justify-content:center;flex-wrap:wrap}
+.nav-links{display:flex;column-gap:4px;row-gap:4px;align-items:center;justify-content:center;flex-wrap:nowrap}
 .nav-links a{
-  padding:10px 12px;border-radius:999px;color:var(--muted);font-weight:600;white-space:nowrap;
-  transition:var(--transition);
+  position:relative;isolation:isolate;overflow:hidden;
+  padding:10px 10px;border-radius:999px;color:var(--muted);font-weight:600;white-space:nowrap;
+  transition:color var(--transition), transform var(--transition), box-shadow var(--transition);
 }
-.nav-links a:hover,.nav-links a.active{background:#fff;color:var(--text);box-shadow:0 8px 18px rgba(23,50,78,.08)}
+.nav-links a::before{
+  content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;
+  background:linear-gradient(135deg,#fff,#eef6ff);
+  box-shadow:0 12px 24px rgba(23,50,78,.08);
+  transform:translateY(70%) scale(.92);
+  opacity:0;
+  transition:transform 260ms ease,opacity 260ms ease;
+}
+.nav-links a:hover,.nav-links a.active{color:var(--text);transform:translateY(-1px)}
+.nav-links a:hover::before,.nav-links a.active::before{transform:translateY(0) scale(1);opacity:1}
 .nav-actions{display:flex;align-items:center;gap:12px}
 .nav-actions .btn{white-space:nowrap}
 .mobile-toggle{
@@ -325,7 +335,8 @@ button,input,textarea,select{font:inherit}
   .navbar{grid-template-columns:minmax(220px, auto) 1fr auto;gap:12px}
   .logo span{font-size:.94rem}
   .logo span small{font-size:.64rem;letter-spacing:.06em}
-  .nav-links a{padding:9px 9px;font-size:.92rem}
+  .nav-links{column-gap:2px}
+  .nav-links a{padding:9px 8px;font-size:.88rem}
   .hero-shell,.page-hero-shell,.split-card,.catalog-shell,.contact-shell,.product-shell,.page-shell,.hero-grid{grid-template-columns:1fr}
   .sidebar{position:static}
   .grid-4,.process,.stats-band,.mini-metrics{grid-template-columns:repeat(2,1fr)}
@@ -340,6 +351,7 @@ button,input,textarea,select{font:inherit}
     position:absolute;left:16px;right:16px;top:84px;display:none;flex-direction:column;align-items:flex-start;
     background:#fff;border:1px solid var(--stroke);border-radius:22px;padding:14px;box-shadow:var(--shadow)
   }
+  .nav-links a{width:100%;padding:10px 12px}
   .nav-links.open{display:flex}
   .mobile-toggle{display:grid;place-items:center}
   .nav-actions .btn-secondary{display:none}
