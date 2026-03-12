@@ -434,3 +434,42 @@ button,input,textarea,select{font:inherit}
   .section-head,.toolbar,.product-meta,.copyright,.timeline-item{flex-direction:column;align-items:flex-start}
   .timeline-item{grid-template-columns:1fr}
 }
+
+.request-builder{display:grid;gap:12px;padding:16px;border:1px solid var(--stroke);border-radius:18px;background:#fff}
+.request-builder-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.request-builder-head h3{margin:0;font-size:1.02rem}
+.request-items{display:grid;gap:10px}
+.request-item{display:grid;grid-template-columns:1fr 120px auto;gap:10px}
+.request-empty{margin:0;color:var(--muted);line-height:1.5}
+
+@media (max-width:680px){
+  .request-item{grid-template-columns:1fr}
+}
+
+.product-card,.product-detail{transition:transform 280ms ease, box-shadow 280ms ease, border-color 280ms ease, background 280ms ease}
+.product-card.in-request,.product-detail.in-request{
+  border-color:#a9d4ff;
+  background:linear-gradient(180deg,#ffffff,#eef7ff);
+  box-shadow:0 18px 36px rgba(14,108,201,.16);
+}
+.product-card.status-flash,.product-detail.status-flash{animation:cardStatusFlash 560ms ease}
+
+.btn.is-added{
+  background:linear-gradient(135deg,#0f7ddf,#35a1ff);
+  color:#fff;
+  border-color:transparent;
+  box-shadow:0 14px 30px rgba(14,108,201,.28);
+}
+.btn.added-burst{animation:buttonAddedBurst 420ms ease}
+
+@keyframes buttonAddedBurst{
+  0%{transform:translateY(0) scale(1)}
+  35%{transform:translateY(-1px) scale(1.05)}
+  100%{transform:translateY(0) scale(1)}
+}
+
+@keyframes cardStatusFlash{
+  0%{box-shadow:0 0 0 rgba(53,161,255,0)}
+  40%{box-shadow:0 0 0 4px rgba(53,161,255,.22), 0 20px 38px rgba(14,108,201,.18)}
+  100%{box-shadow:0 18px 36px rgba(14,108,201,.16)}
+}
