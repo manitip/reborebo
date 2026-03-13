@@ -15,6 +15,47 @@ const observer = new IntersectionObserver((entries)=>{
 },{threshold:.12});
 document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 
+
+const brandWeld = document.querySelector('[data-brand-weld]');
+if (brandWeld) {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const sessionKey = 'comtrade-brand-weld-played';
+  const mobileView = window.matchMedia('(max-width: 900px)').matches;
+  const animationDuration = mobileView ? 1900 : 2450;
+
+  const completeBrandAnimation = () => {
+    brandWeld.classList.remove('is-playing');
+    brandWeld.classList.add('is-complete');
+  };
+
+  if (reduceMotion || sessionStorage.getItem(sessionKey) === '1') {
+    completeBrandAnimation();
+  } else {
+    const startAnimation = () => {
+      if (brandWeld.classList.contains('is-playing') || brandWeld.classList.contains('is-complete')) return;
+
+      brandWeld.classList.add('is-playing');
+      sessionStorage.setItem(sessionKey, '1');
+      window.setTimeout(completeBrandAnimation, animationDuration);
+    };
+
+    if ('IntersectionObserver' in window) {
+      const brandObserver = new IntersectionObserver((entries, observerInstance) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            startAnimation();
+            observerInstance.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.9 });
+
+      brandObserver.observe(brandWeld);
+    } else {
+      startAnimation();
+    }
+  }
+}
+
 const categoryGrid = document.querySelector('.category-grid');
 const filterButtons = Array.from(document.querySelectorAll('[data-filter]'));
 const categoryNavigation = document.querySelector('[data-category-nav]');

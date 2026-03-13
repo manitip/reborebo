@@ -58,6 +58,130 @@ button,input,textarea,select{font:inherit}
 }
 .topbar-links{display:flex;gap:18px;flex-wrap:wrap}
 .topbar-links strong{color:var(--text)}
+.topbar-brand-weld{
+  --metal-dark:#2b2f34;
+  --metal-mid:#6f7680;
+  --metal-light:#c7cdd4;
+  --spark-cold:#ddf4ff;
+  --spark-warm:#ffd38a;
+  position:relative;
+  display:inline-grid;
+  place-items:center;
+  letter-spacing:.014em;
+  font-weight:700;
+  color:transparent;
+  isolation:isolate;
+}
+.topbar-brand-weld .brand-base,
+.topbar-brand-weld .brand-outline,
+.topbar-brand-weld .brand-fill{
+  grid-area:1/1;
+  white-space:nowrap;
+}
+.topbar-brand-weld .brand-base{
+  color:var(--metal-dark);
+  opacity:.09;
+}
+.topbar-brand-weld .brand-outline{
+  color:transparent;
+  -webkit-text-stroke:1px rgba(221,244,255,.92);
+  text-shadow:0 0 8px rgba(191,233,255,.28);
+  clip-path:inset(0 100% 0 0);
+  opacity:0;
+}
+.topbar-brand-weld .brand-fill{
+  color:#9ca6b2;
+  background-image:linear-gradient(124deg,var(--metal-dark) 6%,var(--metal-mid) 34%,var(--metal-light) 52%,#adb5bf 70%,var(--metal-dark) 96%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  text-shadow:0 1px 0 rgba(255,255,255,.16),0 8px 16px rgba(23,50,78,.12);
+  clip-path:inset(0 100% 0 0);
+}
+.topbar-brand-weld .brand-spark,
+.topbar-brand-weld .brand-flare,
+.topbar-brand-weld .brand-particles{position:absolute;inset:0;pointer-events:none}
+.topbar-brand-weld .brand-spark::before,
+.topbar-brand-weld .brand-spark::after{content:"";position:absolute;top:53%;left:-16%;opacity:0}
+.topbar-brand-weld .brand-spark::before{
+  width:22px;
+  height:2px;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--spark-cold),#fff 46%,var(--spark-warm));
+  box-shadow:0 0 6px rgba(221,244,255,.66),0 0 14px rgba(255,211,138,.3);
+}
+.topbar-brand-weld .brand-spark::after{
+  width:58px;
+  height:10px;
+  transform:translate(-82%, -45%);
+  background:linear-gradient(90deg,rgba(191,233,255,0),rgba(191,233,255,.2) 44%,rgba(255,243,214,.2) 74%,rgba(255,243,214,0));
+  filter:blur(3px);
+}
+.topbar-brand-weld .brand-particles::before{
+  content:"";
+  position:absolute;
+  right:7%;
+  top:50%;
+  width:2px;
+  height:2px;
+  border-radius:50%;
+  background:#fff3d6;
+  box-shadow:-10px -4px 0 #ffd38a,7px -8px 0 #bfe9ff,14px -1px 0 #fff3d6;
+  opacity:0;
+}
+.topbar-brand-weld .brand-flare::before{
+  content:"";
+  position:absolute;
+  inset:-14% -9%;
+  background:linear-gradient(108deg,transparent 38%,rgba(255,255,255,.06) 47%,rgba(221,244,255,.56) 51%,rgba(255,255,255,.08) 55%,transparent 63%);
+  transform:translateX(-120%);
+  opacity:0;
+}
+.topbar-brand-weld.is-playing .brand-spark::before,
+.topbar-brand-weld.is-playing .brand-spark::after{animation:brand-spark-pass 900ms cubic-bezier(.36,0,.22,1) 300ms forwards}
+.topbar-brand-weld.is-playing .brand-outline{animation:brand-outline-reveal 900ms cubic-bezier(.42,0,.22,1) 600ms forwards}
+.topbar-brand-weld.is-playing .brand-fill{animation:brand-fill-reveal 800ms cubic-bezier(.42,0,.22,1) 1200ms forwards,brand-settle 280ms ease-out 2080ms forwards}
+.topbar-brand-weld.is-playing .brand-flare::before{animation:brand-flare-pass 400ms ease-out 2000ms forwards}
+.topbar-brand-weld.is-playing .brand-particles::before{animation:brand-particles-pop 260ms ease-out 2100ms forwards}
+.topbar-brand-weld.is-complete .brand-fill,
+.topbar-brand-weld.is-complete .brand-outline{clip-path:inset(0 0 0 0);opacity:1}
+.topbar-brand-weld.is-complete .brand-fill{animation:brand-idle-shine 7s linear 3.2s infinite}
+
+@keyframes brand-spark-pass{
+  0%{left:-16%;opacity:0}
+  10%{opacity:1}
+  84%{opacity:.92}
+  100%{left:108%;opacity:0}
+}
+@keyframes brand-outline-reveal{
+  0%{clip-path:inset(0 100% 0 0);opacity:0}
+  24%{opacity:1}
+  100%{clip-path:inset(0 0 0 0);opacity:1}
+}
+@keyframes brand-fill-reveal{
+  0%{clip-path:inset(0 100% 0 0)}
+  100%{clip-path:inset(0 0 0 0)}
+}
+@keyframes brand-flare-pass{
+  0%{transform:translateX(-120%);opacity:0}
+  12%{opacity:1}
+  100%{transform:translateX(106%);opacity:0}
+}
+@keyframes brand-particles-pop{
+  0%{opacity:0;transform:translate(0,0) scale(.7)}
+  30%{opacity:1}
+  100%{opacity:0;transform:translate(8px,-7px) scale(1)}
+}
+@keyframes brand-settle{
+  0%{transform:translateY(0) scale(1)}
+  56%{transform:translateY(1px) scale(.998)}
+  100%{transform:translateY(0) scale(1)}
+}
+@keyframes brand-idle-shine{
+  0%,100%{filter:brightness(1)}
+  45%{filter:brightness(1)}
+  50%{filter:brightness(1.06)}
+  57%{filter:brightness(1)}
+}
 .site-header{
   position:sticky;
   top:0;
@@ -806,4 +930,21 @@ button,input,textarea,select{font:inherit}
 @keyframes qtyPopoverOut{
   0%{opacity:1;transform:translateY(0) scale(1)}
   100%{opacity:0;transform:translateY(-6px) scale(.92)}
+}
+
+
+@media (max-width:900px){
+  .topbar-brand-weld .brand-outline{-webkit-text-stroke:.8px rgba(221,244,255,.84);text-shadow:0 0 6px rgba(191,233,255,.16)}
+  .topbar-brand-weld .brand-spark::before{height:1px;width:18px;box-shadow:0 0 5px rgba(221,244,255,.48),0 0 10px rgba(255,211,138,.2)}
+  .topbar-brand-weld .brand-spark::after{width:40px;opacity:.72}
+  .topbar-brand-weld .brand-particles::before{box-shadow:-8px -3px 0 #ffd38a,5px -6px 0 #bfe9ff}
+  .topbar-brand-weld.is-playing .brand-spark::before,.topbar-brand-weld.is-playing .brand-spark::after{animation-duration:760ms;animation-delay:260ms}
+  .topbar-brand-weld.is-playing .brand-outline{animation-duration:760ms;animation-delay:500ms}
+  .topbar-brand-weld.is-playing .brand-fill{animation-duration:680ms,220ms;animation-delay:980ms,1700ms}
+  .topbar-brand-weld.is-playing .brand-flare::before{animation-duration:320ms;animation-delay:1660ms}
+  .topbar-brand-weld.is-playing .brand-particles::before{animation-duration:220ms;animation-delay:1740ms}
+}
+@media (prefers-reduced-motion:reduce){
+  .topbar-brand-weld .brand-outline,.topbar-brand-weld .brand-fill{clip-path:inset(0 0 0 0);opacity:1;animation:none}
+  .topbar-brand-weld .brand-spark::before,.topbar-brand-weld .brand-spark::after,.topbar-brand-weld .brand-flare::before,.topbar-brand-weld .brand-particles::before{animation:none;opacity:0}
 }
