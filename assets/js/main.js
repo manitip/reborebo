@@ -31,7 +31,6 @@ const closeCategoryModal = () => {
   if (categoryModalTrigger) {
     categoryModalTrigger.setAttribute('aria-expanded', 'false');
   }
-  document.body.style.overflow = '';
 };
 
 const openCategoryModal = () => {
@@ -39,35 +38,34 @@ const openCategoryModal = () => {
   categoryModal.hidden = false;
 
   let offsetX = 0;
-  let offsetY = 24;
+  let offsetY = -18;
   let originX = '50%';
-  let originY = '50%';
-  let triggerCenterX = window.innerWidth / 2;
-  let triggerCenterY = window.innerHeight / 2;
+  let originY = '0%';
 
-  const dialogRect = categoryModalDialog.getBoundingClientRect();
+  const modalParentRect = categoryModal.offsetParent
+    ? categoryModal.offsetParent.getBoundingClientRect()
+    : { left: 0, top: 0 };
+
   if (categoryModalTrigger) {
     const triggerRect = categoryModalTrigger.getBoundingClientRect();
-    triggerCenterX = triggerRect.left + triggerRect.width / 2;
-    triggerCenterY = triggerRect.top + triggerRect.height / 2;
+    const estimatedWidth = Math.min(1080, Math.max(320, window.innerWidth - 64));
+    const maxLeft = Math.max(0, window.innerWidth - estimatedWidth - 20);
+    const modalLeft = Math.min(Math.max(0, triggerRect.left - modalParentRect.left), maxLeft);
+    const modalTop = triggerRect.bottom - modalParentRect.top + 10;
 
-    const dialogCenterX = dialogRect.left + dialogRect.width / 2;
-    const dialogCenterY = dialogRect.top + dialogRect.height / 2;
+    categoryModal.style.setProperty('--modal-left', `${modalLeft}px`);
+    categoryModal.style.setProperty('--modal-top', `${Math.max(0, modalTop)}px`);
+    categoryModal.style.setProperty('--modal-trigger-local-x', `${triggerRect.width / 2}px`);
 
-    offsetX = triggerCenterX - dialogCenterX;
-    offsetY = triggerCenterY - dialogCenterY;
-
-    const originXPercent = dialogRect.width ? ((triggerCenterX - dialogRect.left) / dialogRect.width) * 100 : 50;
-    const originYPercent = dialogRect.height ? ((triggerCenterY - dialogRect.top) / dialogRect.height) * 100 : 50;
-    originX = `${Math.max(8, Math.min(92, originXPercent)).toFixed(2)}%`;
-    originY = `${Math.max(8, Math.min(92, originYPercent)).toFixed(2)}%`;
+    offsetX = 0;
+    offsetY = -18;
+    originX = `${Math.max(12, Math.min(88, 50)).toFixed(2)}%`;
+    originY = '0%';
   }
 
-  categoryModal.style.setProperty('--modal-trigger-x', `${triggerCenterX}px`);
-  categoryModal.style.setProperty('--modal-trigger-y', `${triggerCenterY}px`);
   categoryModalDialog.style.setProperty('--modal-from-x', `${offsetX}px`);
   categoryModalDialog.style.setProperty('--modal-from-y', `${offsetY}px`);
-  categoryModalDialog.style.setProperty('--modal-from-scale', '0.06');
+  categoryModalDialog.style.setProperty('--modal-from-scale', '0.02');
   categoryModalDialog.style.setProperty('--modal-origin-x', originX);
   categoryModalDialog.style.setProperty('--modal-origin-y', originY);
 
@@ -75,7 +73,6 @@ const openCategoryModal = () => {
   if (categoryModalTrigger) {
     categoryModalTrigger.setAttribute('aria-expanded', 'true');
   }
-  document.body.style.overflow = 'hidden';
 };
 
 const syncCategoryTiles = (target = 'all', selectedTile = null) => {
@@ -165,6 +162,17 @@ if (categoryModal) {
     node.addEventListener('click', closeCategoryModal);
   });
 }
+
+document.addEventListener('click', (event) => {
+  if (!categoryModal || !categoryModal.classList.contains('open')) return;
+
+  const clickedTrigger = categoryModalTrigger && categoryModalTrigger.contains(event.target);
+  const clickedInsideDialog = categoryModalDialog && categoryModalDialog.contains(event.target);
+
+  if (!clickedTrigger && !clickedInsideDialog) {
+    closeCategoryModal();
+  }
+});
 
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
