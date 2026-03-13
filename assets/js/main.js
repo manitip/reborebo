@@ -18,6 +18,208 @@ document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 const categoryGrid = document.querySelector('.category-grid');
 const filterButtons = Array.from(document.querySelectorAll('[data-filter]'));
 const categoryNavigation = document.querySelector('[data-category-nav]');
+const categoryModal = document.querySelector('[data-category-modal]');
+const categoryModalTrigger = document.querySelector('[data-category-modal-trigger]');
+const categoryModalDialog = categoryModal ? categoryModal.querySelector('.catalog-category-modal__dialog') : null;
+
+const subcategoryPanelTitle = categoryModal ? categoryModal.querySelector('[data-subcategory-title]') : null;
+const subcategoryPanelList = categoryModal ? categoryModal.querySelector('[data-subcategory-list]') : null;
+
+const subcategoryCatalog = {
+  all: {
+    title: 'Весь каталог',
+    items: ['Выберите конкретную категорию слева, чтобы увидеть её подкатегории.']
+  },
+  materials: {
+    title: 'Сварочные материалы',
+    items: [
+      'Для легированных, высокопрочных и теплоустойчивых сталей',
+      'Для сварки углеродистых и низколегированных сталей',
+      'Для наплавки и ремонта деталей',
+      'Для сварки сплавов цветных металлов',
+      'Вольфрамовые, угольные электроды',
+      'Для сварки чугуна'
+    ]
+  },
+  chemistry: {
+    title: 'Техническая химия',
+    items: [
+      'Средства для травления и очистки нержавейки',
+      'Средства против налипания брызг',
+      'Средства для дефектоскопии (пенетранты)',
+      'Охлаждающий агент',
+      'Средства для травления и очистки алюминия',
+      'Кислотостойкие кисти'
+    ]
+  },
+  equipment: {
+    title: 'Сварочное оборудование',
+    items: [
+      'Сварочные инверторы MMA',
+      'Установки плазменной резки',
+      'Сварочные полуавтоматы MIG',
+      'Сварочные генераторы и агрегаты',
+      'Сварочные аргонодуговые аппараты TIG',
+      'Комплектующие для электросварки',
+      'Центраторы',
+      'Шланг-пакеты'
+    ]
+  },
+  protection: {
+    title: 'Средства защиты',
+    items: [
+      'Для защиты рук',
+      'Сварочные маски',
+      'Для защиты органов зрения',
+      'Для защиты органов слуха',
+      'Защитная одежда',
+      'Для защиты органов дыхания',
+      'Для защиты головы'
+    ]
+  },
+  abrasive: {
+    title: 'Абразивные материалы и инструмент',
+    items: [
+      'Круги фибровые',
+      'Круги шлифовальные (зачистные)',
+      'Круги лепестковые',
+      'Борфрезы (шарошки)',
+      'Круги отрезные'
+    ]
+  },
+  automation: {
+    title: 'Автоматизация и роботизация',
+    items: [
+      'Портальные установки с ЧПУ для резки различных материалов',
+      'Комплектующие автоматизации и роботизации',
+      'Сварочные трактора',
+      'Орбитальная сварка',
+      'Лазерная сварка'
+    ]
+  },
+  gas: {
+    title: 'Газопламенное оборудование',
+    items: [
+      'Портативные установки резаки по металлу',
+      'Комплектующие для газосварки',
+      'Редукторы, регуляторы газовые, подогреватели',
+      'Резаки газовые',
+      'Горелки газовые'
+    ]
+  },
+  workplace: {
+    title: 'Оборудование места сварщика',
+    items: [
+      'Наборы для организации сварочного поста',
+      'Оснастка',
+      'Сварочно-монтажные столы и приспособления',
+      'Защитные шторы и кабинки CEPRO',
+      'Фильтровентиляционное оборудование'
+    ]
+  },
+  torches: {
+    title: 'Горелки и ЗИП',
+    items: [
+      'Горелки MIG сварка',
+      'Горелки TIG сварка',
+      'Плазмотроны CUT',
+      'ЗИП MIG сварка',
+      'ЗИП TIG сварка',
+      'ЗИП CUT'
+    ]
+  },
+  gouging: {
+    title: 'Строгачи и угольные электроды',
+    items: [
+      'Строгачи',
+      'Бесконечные угольные электроды (с ниппелем) омеднённые',
+      'Круглые угольные электроды омеднённые',
+      'Плоские угольные омеднённые',
+      'Полукруглые угольные омеднённые'
+    ]
+  },
+  lathe: {
+    title: 'Токарное оборудование',
+    items: [
+      'На странице каталога отдельные подкатегории для этого раздела не указаны',
+      'После заголовка сразу идёт список товаров'
+    ]
+  }
+};
+
+const renderSubcategoryPanel = (key = 'all') => {
+  if (!subcategoryPanelTitle || !subcategoryPanelList) return;
+
+  const payload = subcategoryCatalog[key] || subcategoryCatalog.all;
+  subcategoryPanelTitle.textContent = payload.title;
+  subcategoryPanelList.innerHTML = '';
+
+  payload.items.forEach((item, index) => {
+    const li = document.createElement('li');
+    li.textContent = item;
+    li.style.animationDelay = `${index * 40}ms`;
+    subcategoryPanelList.append(li);
+  });
+};
+
+const closeCategoryModal = () => {
+  if (!categoryModal || !categoryModal.classList.contains('open')) return;
+  categoryModal.classList.remove('open');
+  setTimeout(() => {
+    categoryModal.hidden = true;
+  }, 320);
+  if (categoryModalTrigger) {
+    categoryModalTrigger.setAttribute('aria-expanded', 'false');
+  }
+};
+
+const openCategoryModal = () => {
+  if (!categoryModal || !categoryModalDialog) return;
+  categoryModal.hidden = false;
+
+  let offsetX = 0;
+  let offsetY = -18;
+  let originX = '50%';
+  let originY = '0%';
+
+  const modalParentRect = categoryModal.offsetParent
+    ? categoryModal.offsetParent.getBoundingClientRect()
+    : { left: 0, top: 0, width: window.innerWidth };
+
+  if (categoryModalTrigger) {
+    const triggerRect = categoryModalTrigger.getBoundingClientRect();
+    const parentWidth = Math.max(320, modalParentRect.width || window.innerWidth);
+    const modalWidth = Math.min(920, parentWidth, Math.max(320, window.innerWidth - 40));
+
+    const rawLeft = triggerRect.right - modalParentRect.left - modalWidth;
+    const maxLeft = Math.max(0, parentWidth - modalWidth);
+    const modalLeft = Math.min(Math.max(0, rawLeft), maxLeft);
+    const modalTop = triggerRect.bottom - modalParentRect.top + 10;
+
+    const triggerCenterLocalX = (triggerRect.left - modalParentRect.left - modalLeft) + (triggerRect.width / 2);
+
+    categoryModal.style.setProperty('--modal-width', `${modalWidth}px`);
+    categoryModal.style.setProperty('--modal-left', `${modalLeft}px`);
+    categoryModal.style.setProperty('--modal-top', `${Math.max(0, modalTop)}px`);
+    categoryModal.style.setProperty('--modal-trigger-local-x', `${triggerCenterLocalX}px`);
+
+    offsetX = 0;
+    offsetY = -20;
+    originX = `${Math.max(10, Math.min(90, (triggerCenterLocalX / modalWidth) * 100)).toFixed(2)}%`;
+    originY = '0%';
+  }
+
+  categoryModalDialog.style.setProperty('--modal-from-x', `${offsetX}px`);
+  categoryModalDialog.style.setProperty('--modal-from-y', `${offsetY}px`);
+  categoryModalDialog.style.setProperty('--modal-from-scale', '0.02');
+  categoryModalDialog.style.setProperty('--modal-origin-x', originX);
+  categoryModalDialog.style.setProperty('--modal-origin-y', originY);
+
+  requestAnimationFrame(() => categoryModal.classList.add('open'));
+  if (categoryModalTrigger) {
+    categoryModalTrigger.setAttribute('aria-expanded', 'true');
+  }
+};
 
 const syncCategoryTiles = (target = 'all', selectedTile = null) => {
   if (!categoryNavigation) return;
@@ -68,6 +270,7 @@ filterButtons.forEach((btn)=>{
 });
 
 if (categoryNavigation) {
+  renderSubcategoryPanel();
   categoryNavigation.querySelectorAll('[data-category-link]').forEach((tile)=>{
     tile.addEventListener('click', ()=>{
       const target = tile.dataset.filterTarget || 'all';
@@ -78,6 +281,7 @@ if (categoryNavigation) {
       setTimeout(() => tile.classList.remove('is-pressed'), 420);
 
       applyCatalogFilter(target, { animate: true, selectedTile: tile });
+      renderSubcategoryPanel(tile.dataset.subcategoryKey || target);
 
       if (scrollTarget) {
         const destination = document.getElementById(scrollTarget);
@@ -85,9 +289,44 @@ if (categoryNavigation) {
           setTimeout(()=>destination.scrollIntoView({ behavior: 'smooth', block: 'start' }), 190);
         }
       }
+
     });
   });
 }
+
+if (categoryModalTrigger) {
+  categoryModalTrigger.addEventListener('click', () => {
+    if (categoryModal && categoryModal.classList.contains('open')) {
+      closeCategoryModal();
+      return;
+    }
+    openCategoryModal();
+    renderSubcategoryPanel();
+  });
+}
+
+if (categoryModal) {
+  categoryModal.querySelectorAll('[data-category-modal-close]').forEach((node) => {
+    node.addEventListener('click', closeCategoryModal);
+  });
+}
+
+document.addEventListener('click', (event) => {
+  if (!categoryModal || !categoryModal.classList.contains('open')) return;
+
+  const clickedTrigger = categoryModalTrigger && categoryModalTrigger.contains(event.target);
+  const clickedInsideDialog = categoryModalDialog && categoryModalDialog.contains(event.target);
+
+  if (!clickedTrigger && !clickedInsideDialog) {
+    closeCategoryModal();
+  }
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    closeCategoryModal();
+  }
+});
 
 const searchInput = document.querySelector('[data-search]');
 if(searchInput){
