@@ -377,17 +377,16 @@ button,input,textarea,select{font:inherit}
 }
 .form-grid textarea{min-height:140px;resize:vertical}
 
-.form-dropdown-intro{margin:2px 2px 0;color:var(--muted);font-size:.93rem;line-height:1.6}
+.form-dropdown-title{margin:2px 2px -2px;color:#5f7891;font-size:.82rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .form-dropdown{position:relative}
 .form-dropdown-trigger,
 .delivery-dropdown-trigger{
-  width:100%;display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 12px;
-  padding:13px 16px;border-radius:16px;border:1px solid var(--stroke);background:var(--surface-2);
-  color:var(--text);cursor:pointer;transition:border-color .28s ease, box-shadow .28s ease, background .28s ease
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:15px 16px;border-radius:16px;border:1px solid var(--stroke);background:var(--surface-2);
+  color:var(--text);font-weight:700;cursor:pointer;transition:border-color .28s ease, box-shadow .28s ease, background .28s ease
 }
 .form-dropdown-trigger svg,
-.delivery-dropdown-trigger svg{grid-row:1 / span 2;grid-column:2;transition:transform .32s cubic-bezier(.34,1.56,.64,1)}
-.form-dropdown-caption{font-size:.76rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#66809a}
+.delivery-dropdown-trigger svg{transition:transform .32s cubic-bezier(.34,1.56,.64,1)}
 .form-dropdown-value{font-size:1rem;font-weight:700}
 .form-dropdown.is-open .form-dropdown-trigger,
 .delivery-dropdown.is-open .delivery-dropdown-trigger{border-color:#9ec4ea;background:#fff;box-shadow:0 10px 20px rgba(20,70,120,.12)}
