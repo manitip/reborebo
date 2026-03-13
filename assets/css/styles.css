@@ -129,8 +129,8 @@ button,input,textarea,select{font:inherit}
 
 @keyframes requestQuotePulse{
   0%,100%{transform:translateY(0) scale(1);box-shadow:0 0 0 0 rgba(14,108,201,0)}
-  35%{transform:translateY(-.5px) scale(1.01);box-shadow:0 0 0 5px rgba(14,108,201,.10)}
-  60%{transform:translateY(0) scale(1.006);box-shadow:0 0 0 2px rgba(14,108,201,.07)}
+  35%{transform:translateY(-.5px) scale(1.01);box-shadow:0 0 18px 4px rgba(14,108,201,.12)}
+  60%{transform:translateY(0) scale(1.006);box-shadow:0 0 10px 2px rgba(14,108,201,.08)}
 }
 .pill,.tag,.chip{
   display:inline-flex;align-items:center;gap:8px;
