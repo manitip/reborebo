@@ -24,6 +24,7 @@ const categoryModalDialog = categoryModal ? categoryModal.querySelector('.catalo
 
 const subcategoryPanelTitle = categoryModal ? categoryModal.querySelector('[data-subcategory-title]') : null;
 const subcategoryPanelList = categoryModal ? categoryModal.querySelector('[data-subcategory-list]') : null;
+let activeCategoryScrollTarget = '';
 
 const subcategoryCatalog = {
   all: {
@@ -147,16 +148,35 @@ const subcategoryCatalog = {
   }
 };
 
-const renderSubcategoryPanel = (key = 'all') => {
+const renderSubcategoryPanel = (key = 'all', scrollTarget = '') => {
   if (!subcategoryPanelTitle || !subcategoryPanelList) return;
 
   const payload = subcategoryCatalog[key] || subcategoryCatalog.all;
+  activeCategoryScrollTarget = scrollTarget || '';
   subcategoryPanelTitle.textContent = payload.title;
   subcategoryPanelList.innerHTML = '';
 
   payload.items.forEach((item, index) => {
     const li = document.createElement('li');
-    li.textContent = item;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'catalog-subcategory-button';
+    button.textContent = item;
+    button.style.animationDelay = `${index * 40}ms`;
+
+    if (activeCategoryScrollTarget) {
+      button.dataset.scrollTarget = activeCategoryScrollTarget;
+    }
+
+    button.addEventListener('click', () => {
+      const destination = button.dataset.scrollTarget ? document.getElementById(button.dataset.scrollTarget) : null;
+      if (destination) {
+        destination.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      closeCategoryModal();
+    });
+
+    li.append(button);
     li.style.animationDelay = `${index * 40}ms`;
     subcategoryPanelList.append(li);
   });
@@ -281,14 +301,7 @@ if (categoryNavigation) {
       setTimeout(() => tile.classList.remove('is-pressed'), 420);
 
       applyCatalogFilter(target, { animate: true, selectedTile: tile });
-      renderSubcategoryPanel(tile.dataset.subcategoryKey || target);
-
-      if (scrollTarget) {
-        const destination = document.getElementById(scrollTarget);
-        if (destination) {
-          setTimeout(()=>destination.scrollIntoView({ behavior: 'smooth', block: 'start' }), 190);
-        }
-      }
+      renderSubcategoryPanel(tile.dataset.subcategoryKey || target, scrollTarget);
 
     });
   });

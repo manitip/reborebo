@@ -469,15 +469,22 @@ button,input,textarea,select{font:inherit}
 .catalog-subcategory-eyebrow{margin:0;color:#b5d9f8;font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
 .catalog-subcategory-panel h3{margin:8px 0 10px;color:#fff;font-size:1.18rem}
 .catalog-subcategory-list{margin:0;padding:0;display:grid;gap:8px}
-.catalog-subcategory-list li{
-  list-style:none;padding:10px 12px 10px 20px;border-radius:12px;position:relative;
+.catalog-subcategory-list li{list-style:none;animation:subcategoryItemIn .3s ease both}
+.catalog-subcategory-button{
+  width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;
   border:1px solid rgba(176,208,235,.38);background:rgba(255,255,255,.10);color:#eaf6ff;
-  line-height:1.35;font-size:.9rem;animation:subcategoryItemIn .3s ease both
+  line-height:1.35;font-size:.9rem;text-align:left;cursor:pointer;
+  transition:transform .24s ease,box-shadow .24s ease,border-color .24s ease,background .24s ease
 }
-.catalog-subcategory-list li::before{
-  content:'';position:absolute;left:10px;top:15px;width:5px;height:5px;border-radius:50%;
+.catalog-subcategory-button::before{
+  content:'';width:5px;height:5px;border-radius:50%;flex:0 0 5px;
   background:linear-gradient(135deg,#ff9a53,#72bbff)
 }
+.catalog-subcategory-button:hover{
+  transform:translateY(-1px);border-color:rgba(210,231,255,.9);
+  background:rgba(255,255,255,.16);box-shadow:0 10px 20px rgba(8,31,56,.2)
+}
+.catalog-subcategory-button:active{transform:translateY(0) scale(.99)}
 @keyframes subcategoryPanelFade{
   from{opacity:0;transform:translateY(6px)}
   to{opacity:1;transform:none}
