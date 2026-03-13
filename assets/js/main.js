@@ -37,6 +37,7 @@ const sidebarContextFilters = document.querySelector('[data-sidebar-context-filt
 const sidebarReset = document.querySelector('[data-sidebar-reset]');
 const sidebarOpenButton = document.querySelector('[data-sidebar-open]');
 const sidebarCloseButton = document.querySelector('[data-sidebar-close]');
+const sidebarBackdrop = document.querySelector('[data-sidebar-backdrop]');
 
 const catalogSidebarConfig = {
   categories: [
@@ -314,6 +315,7 @@ const applySidebarStateToUI = () => {
       node.addEventListener('click', () => {
         const destination = document.getElementById(node.dataset.scrollTarget || '');
         if (destination) destination.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (shouldAutoCloseSidebar()) closeCatalogSidebar();
       });
     });
   }
@@ -354,6 +356,22 @@ const applySidebarCategory = (categoryId, syncFilter = true) => {
   updateSidebarUrl();
 };
 
+const shouldAutoCloseSidebar = () => window.matchMedia('(max-width: 860px)').matches;
+
+const closeCatalogSidebar = () => {
+  if (!sidebarRoot) return;
+  sidebarRoot.classList.remove('open');
+  document.body.classList.remove('sidebar-open');
+  if (sidebarBackdrop) sidebarBackdrop.classList.remove('open');
+};
+
+const openCatalogSidebar = () => {
+  if (!sidebarRoot) return;
+  sidebarRoot.classList.add('open');
+  document.body.classList.add('sidebar-open');
+  if (sidebarBackdrop) sidebarBackdrop.classList.add('open');
+};
+
 const renderCatalogSidebar = () => {
   if (!sidebarRoot || !sidebarCategories || !sidebarScenarios) return;
 
@@ -368,6 +386,7 @@ const renderCatalogSidebar = () => {
   sidebarCategories.querySelectorAll('[data-category-id]').forEach((button) => {
     button.addEventListener('click', () => {
       applySidebarCategory(button.dataset.categoryId || 'materials');
+      if (shouldAutoCloseSidebar()) closeCatalogSidebar();
     });
   });
 
@@ -376,6 +395,7 @@ const renderCatalogSidebar = () => {
       sidebarState.scenarioId = sidebarState.scenarioId === chip.dataset.scenario ? '' : (chip.dataset.scenario || '');
       applySidebarStateToUI();
       updateSidebarUrl();
+      if (shouldAutoCloseSidebar()) closeCatalogSidebar();
     });
   });
 
@@ -396,17 +416,15 @@ const renderCatalogSidebar = () => {
   applySidebarCategory(sidebarState.categoryId, true);
 
   if (sidebarOpenButton) {
-    sidebarOpenButton.addEventListener('click', () => {
-      sidebarRoot.classList.add('open');
-      document.body.classList.add('sidebar-open');
-    });
+    sidebarOpenButton.addEventListener('click', openCatalogSidebar);
   }
 
   if (sidebarCloseButton) {
-    sidebarCloseButton.addEventListener('click', () => {
-      sidebarRoot.classList.remove('open');
-      document.body.classList.remove('sidebar-open');
-    });
+    sidebarCloseButton.addEventListener('click', closeCatalogSidebar);
+  }
+
+  if (sidebarBackdrop) {
+    sidebarBackdrop.addEventListener('click', closeCatalogSidebar);
   }
 };
 
@@ -568,6 +586,7 @@ document.addEventListener('click', (event) => {
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     closeCategoryModal();
+    closeCatalogSidebar();
   }
 });
 
