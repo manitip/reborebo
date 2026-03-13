@@ -412,7 +412,8 @@ button,input,textarea,select{font:inherit}
   position:relative;z-index:1;width:min(1080px,100%);max-height:min(84vh,820px);overflow:auto;
   padding:20px;border-radius:24px;background:linear-gradient(180deg,#fbfdff,#eef5ff);
   border:1px solid #c7d8eb;box-shadow:0 24px 62px rgba(15,41,70,.28);
-  transform:translateY(24px) scale(.98);opacity:0;
+  transform:translate(var(--modal-from-x,0),var(--modal-from-y,24px)) scale(var(--modal-from-scale,.98));opacity:0;
+  transform-origin:var(--modal-origin-x,50%) var(--modal-origin-y,50%);
   transition:transform .42s cubic-bezier(.2,.85,.25,1),opacity .35s ease
 }
 .catalog-category-modal.open .catalog-category-modal__dialog{transform:translateY(0) scale(1);opacity:1}
