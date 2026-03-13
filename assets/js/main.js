@@ -18,6 +18,244 @@ document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 const categoryGrid = document.querySelector('.category-grid');
 const filterButtons = Array.from(document.querySelectorAll('[data-filter]'));
 const categoryNavigation = document.querySelector('[data-category-nav]');
+const categoryModal = document.querySelector('[data-category-modal]');
+const categoryModalTrigger = document.querySelector('[data-category-modal-trigger]');
+const categoryModalDialog = categoryModal ? categoryModal.querySelector('.catalog-category-modal__dialog') : null;
+
+const subcategoryPanelTitle = categoryModal ? categoryModal.querySelector('[data-subcategory-title]') : null;
+const subcategoryPanelList = categoryModal ? categoryModal.querySelector('[data-subcategory-list]') : null;
+let activeCategoryScrollTarget = '';
+
+const subcategoryDescription = categoryModal ? categoryModal.querySelector('[data-subcategory-description]') : null;
+
+const subcategoryCatalog = {
+  all: {
+    title: 'Весь каталог',
+    items: [
+      {
+        name: 'Выберите категорию',
+        description: 'Выберите конкретную категорию слева, чтобы увидеть подкатегории и описание каждого направления.'
+      }
+    ]
+  },
+  materials: {
+    title: 'Сварочные материалы',
+    items: [
+      { name: 'Для легированных, высокопрочных и теплоустойчивых сталей', description: 'Материалы для сварки специальных сталей, где важны прочность, стойкость к нагрузкам и работе при повышенных температурах.' },
+      { name: 'Для сварки углеродистых и низколегированных сталей', description: 'Расходники для самых распространённых сталей, применяемых в строительстве, производстве и ремонте.' },
+      { name: 'Для наплавки и ремонта деталей', description: 'Материалы для восстановления изношенных поверхностей, усиления рабочих зон и ремонта металлических деталей.' },
+      { name: 'Для сварки сплавов цветных металлов', description: 'Решения для работы с алюминием, медью и другими цветными металлами и их сплавами.' },
+      { name: 'Вольфрамовые, угольные электроды', description: 'Электроды для TIG-сварки, строжки и других специальных сварочных операций.' },
+      { name: 'Для сварки чугуна', description: 'Материалы для ремонта и соединения чугунных деталей с учётом особенностей этого металла.' }
+    ]
+  },
+  chemistry: {
+    title: 'Техническая химия',
+    items: [
+      { name: 'Средства для травления и очистки нержавейки', description: 'Химия для удаления окалины, цветов побежалости и загрязнений после сварки нержавеющей стали.' },
+      { name: 'Средства против налипания брызг', description: 'Составы, которые уменьшают прилипание сварочных брызг к металлу, соплам и оснастке.' },
+      { name: 'Средства для дефектоскопии (пенетранты)', description: 'Материалы для капиллярного контроля, помогающие выявлять поверхностные трещины и дефекты.' },
+      { name: 'Охлаждающий агент', description: 'Средство для охлаждения узлов оборудования или инструмента в процессе работы.' },
+      { name: 'Средства для травления и очистки алюминия', description: 'Химические составы для подготовки, очистки и обработки алюминиевых поверхностей.' },
+      { name: 'Кислотостойкие кисти', description: 'Кисти для нанесения агрессивных химических составов, устойчивые к воздействию кислот.' }
+    ]
+  },
+  equipment: {
+    title: 'Сварочное оборудование',
+    items: [
+      { name: 'Сварочные инверторы MMA', description: 'Аппараты для ручной дуговой сварки штучным электродом.' },
+      { name: 'Установки плазменной резки', description: 'Оборудование для быстрой и точной резки металла плазмой.' },
+      { name: 'Сварочные полуавтоматы MIG', description: 'Аппараты для сварки проволокой в среде защитного газа или с порошковой проволокой.' },
+      { name: 'Сварочные генераторы и агрегаты', description: 'Автономные источники питания для сварки на выезде или в полевых условиях.' },
+      { name: 'Сварочные аргонодуговые аппараты TIG', description: 'Оборудование для точной сварки неплавящимся электродом в защитном газе.' },
+      { name: 'Комплектующие для электросварки', description: 'Вспомогательные элементы и аксессуары для подключения, обслуживания и работы сварочного оборудования.' },
+      { name: 'Центраторы', description: 'Приспособления для точного совмещения труб и деталей перед сваркой.' },
+      { name: 'Шланг-пакеты', description: 'Кабельно-шланговые сборки для подачи тока, газа и проволоки к горелке.' }
+    ]
+  },
+  protection: {
+    title: 'Средства защиты',
+    items: [
+      { name: 'Для защиты рук', description: 'Перчатки, краги и другие изделия для защиты рук от жара, искр и механических воздействий.' },
+      { name: 'Сварочные маски', description: 'Средства защиты лица и глаз сварщика от излучения, искр и брызг металла.' },
+      { name: 'Для защиты органов зрения', description: 'Очки и защитные средства для работ, где требуется защита глаз вне сварочной маски.' },
+      { name: 'Для защиты органов слуха', description: 'Беруши, наушники и другие решения для снижения воздействия шума.' },
+      { name: 'Защитная одежда', description: 'Спецодежда для защиты тела от искр, тепла и производственных загрязнений.' },
+      { name: 'Для защиты органов дыхания', description: 'Респираторы и другие средства защиты от дыма, пыли и вредных испарений.' },
+      { name: 'Для защиты головы', description: 'Каски и сопутствующие изделия для защиты головы на производстве.' }
+    ]
+  },
+  abrasive: {
+    title: 'Абразивные материалы и инструмент',
+    items: [
+      { name: 'Круги фибровые', description: 'Абразивные круги для шлифования, зачистки и подготовки поверхности.' },
+      { name: 'Круги шлифовальные (зачистные)', description: 'Круги для удаления наплывов, ржавчины, окалины и грубой обработки металла.' },
+      { name: 'Круги лепестковые', description: 'Универсальные круги для шлифовки, зачистки и более аккуратной обработки поверхности.' },
+      { name: 'Борфрезы (шарошки)', description: 'Насадки для точной обработки металла, снятия заусенцев и доработки сложных участков.' },
+      { name: 'Круги отрезные', description: 'Диски для резки металла и других материалов.' }
+    ]
+  },
+  automation: {
+    title: 'Автоматизация и роботизация',
+    items: [
+      { name: 'Портальные установки с ЧПУ для резки различных материалов', description: 'Автоматизированные системы для высокоточной резки металла и других материалов по программе.' },
+      { name: 'Комплектующие автоматизации и роботизации', description: 'Узлы, модули и элементы для построения или модернизации автоматизированных комплексов.' },
+      { name: 'Сварочные трактора', description: 'Самоходные устройства для механизированного ведения сварочного процесса.' },
+      { name: 'Орбитальная сварка', description: 'Оборудование для автоматической сварки труб и круговых соединений с высокой повторяемостью.' },
+      { name: 'Лазерная сварка', description: 'Решения для точной, быстрой и малодеформирующей сварки лазером.' }
+    ]
+  },
+  gas: {
+    title: 'Газопламенное оборудование',
+    items: [
+      { name: 'Портативные установки резаки по металлу', description: 'Переносные решения для газовой резки металла в мастерской и на выезде.' },
+      { name: 'Комплектующие для газосварки', description: 'Расходные и соединительные элементы для работы газосварочного оборудования.' },
+      { name: 'Редукторы, регуляторы газовые, подогреватели', description: 'Устройства для контроля давления, подачи и стабильной работы газа.' },
+      { name: 'Резаки газовые', description: 'Инструмент для газовой резки металла.' },
+      { name: 'Горелки газовые', description: 'Оборудование для нагрева, пайки, сварки и других газопламенных работ.' }
+    ]
+  },
+  workplace: {
+    title: 'Оборудование места сварщика',
+    items: [
+      { name: 'Наборы для организации сварочного поста', description: 'Комплекты для оснащения рабочего места сварщика всем необходимым.' },
+      { name: 'Оснастка', description: 'Вспомогательные элементы для фиксации, позиционирования и удобства выполнения работ.' },
+      { name: 'Сварочно-монтажные столы и приспособления', description: 'Рабочие столы и системы для сборки, фиксации и точной подготовки деталей.' },
+      { name: 'Защитные шторы и кабинки CEPRO', description: 'Средства ограждения рабочей зоны от излучения, искр и визуального воздействия сварки.' },
+      { name: 'Фильтровентиляционное оборудование', description: 'Системы для удаления сварочного дыма и очистки воздуха в рабочей зоне.' }
+    ]
+  },
+  torches: {
+    title: 'Горелки и ЗИП',
+    items: [
+      { name: 'Горелки MIG сварка', description: 'Горелки для полуавтоматической сварки проволокой.' },
+      { name: 'Горелки TIG сварка', description: 'Горелки для аргонодуговой сварки с точным контролем дуги.' },
+      { name: 'Плазмотроны CUT', description: 'Рабочие резаки для плазменной резки.' },
+      { name: 'ЗИП MIG сварка', description: 'Запасные части и расходники для MIG-горелок и полуавтоматов.' },
+      { name: 'ЗИП TIG сварка', description: 'Комплектующие и расходные элементы для TIG-горелок.' },
+      { name: 'ЗИП CUT', description: 'Запасные части и расходники для плазменной резки.' }
+    ]
+  },
+  gouging: {
+    title: 'Строгачи и угольные электроды',
+    items: [
+      { name: 'Строгачи', description: 'Инструмент или устройства для воздушно-дуговой строжки и удаления металла.' },
+      { name: 'Бесконечные угольные электроды (с ниппелем) омеднённые', description: 'Электроды для продолжительной работы с возможностью наращивания длины.' },
+      { name: 'Круглые угольные электроды омеднённые', description: 'Электроды круглого сечения для строжки и специальных процессов обработки металла.' },
+      { name: 'Плоские угольные омеднённые', description: 'Плоские электроды для определённых видов строжки и снятия металла.' },
+      { name: 'Полукруглые угольные омеднённые', description: 'Электроды специальной формы для профильной обработки и технологических задач.' }
+    ]
+  },
+  lathe: {
+    title: 'Токарное оборудование',
+    items: [
+      { name: 'Раздел без выделенных подкатегорий', description: 'На странице каталога отдельные подкатегории для токарного оборудования не указаны — раздел представлен сразу товарами.' }
+    ]
+  }
+};
+
+const renderSubcategoryPanel = (key = 'all', scrollTarget = '') => {
+  if (!subcategoryPanelTitle || !subcategoryPanelList) return;
+
+  const payload = subcategoryCatalog[key] || subcategoryCatalog.all;
+  activeCategoryScrollTarget = scrollTarget || '';
+  subcategoryPanelTitle.textContent = payload.title;
+  subcategoryPanelList.innerHTML = '';
+
+  const updateDescription = (description) => {
+    if (!subcategoryDescription) return;
+    subcategoryDescription.textContent = description || 'Выберите подкатегорию, чтобы увидеть краткое описание.';
+  };
+
+  payload.items.forEach((item, index) => {
+    const li = document.createElement('li');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'catalog-subcategory-button';
+    button.textContent = item.name;
+    button.style.animationDelay = `${index * 40}ms`;
+
+    if (activeCategoryScrollTarget) {
+      button.dataset.scrollTarget = activeCategoryScrollTarget;
+    }
+
+    button.addEventListener('mouseenter', () => updateDescription(item.description));
+    button.addEventListener('focus', () => updateDescription(item.description));
+
+    button.addEventListener('click', () => {
+      const destination = button.dataset.scrollTarget ? document.getElementById(button.dataset.scrollTarget) : null;
+      if (destination) {
+        destination.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      closeCategoryModal();
+    });
+
+    li.append(button);
+    li.style.animationDelay = `${index * 40}ms`;
+    subcategoryPanelList.append(li);
+  });
+
+  updateDescription(payload.items[0] ? payload.items[0].description : '');
+};
+
+const closeCategoryModal = () => {
+  if (!categoryModal || !categoryModal.classList.contains('open')) return;
+  categoryModal.classList.remove('open');
+  setTimeout(() => {
+    categoryModal.hidden = true;
+  }, 320);
+  if (categoryModalTrigger) {
+    categoryModalTrigger.setAttribute('aria-expanded', 'false');
+  }
+};
+
+const openCategoryModal = () => {
+  if (!categoryModal || !categoryModalDialog) return;
+  categoryModal.hidden = false;
+
+  let offsetX = 0;
+  let offsetY = -18;
+  let originX = '50%';
+  let originY = '0%';
+
+  const modalParentRect = categoryModal.offsetParent
+    ? categoryModal.offsetParent.getBoundingClientRect()
+    : { left: 0, top: 0, width: window.innerWidth };
+
+  if (categoryModalTrigger) {
+    const triggerRect = categoryModalTrigger.getBoundingClientRect();
+    const parentWidth = Math.max(320, modalParentRect.width || window.innerWidth);
+    const modalWidth = Math.min(920, parentWidth, Math.max(320, window.innerWidth - 40));
+
+    const rawLeft = triggerRect.right - modalParentRect.left - modalWidth;
+    const maxLeft = Math.max(0, parentWidth - modalWidth);
+    const modalLeft = Math.min(Math.max(0, rawLeft), maxLeft);
+    const modalTop = triggerRect.bottom - modalParentRect.top + 10;
+
+    const triggerCenterLocalX = (triggerRect.left - modalParentRect.left - modalLeft) + (triggerRect.width / 2);
+
+    categoryModal.style.setProperty('--modal-width', `${modalWidth}px`);
+    categoryModal.style.setProperty('--modal-left', `${modalLeft}px`);
+    categoryModal.style.setProperty('--modal-top', `${Math.max(0, modalTop)}px`);
+    categoryModal.style.setProperty('--modal-trigger-local-x', `${triggerCenterLocalX}px`);
+
+    offsetX = 0;
+    offsetY = -20;
+    originX = `${Math.max(10, Math.min(90, (triggerCenterLocalX / modalWidth) * 100)).toFixed(2)}%`;
+    originY = '0%';
+  }
+
+  categoryModalDialog.style.setProperty('--modal-from-x', `${offsetX}px`);
+  categoryModalDialog.style.setProperty('--modal-from-y', `${offsetY}px`);
+  categoryModalDialog.style.setProperty('--modal-from-scale', '0.02');
+  categoryModalDialog.style.setProperty('--modal-origin-x', originX);
+  categoryModalDialog.style.setProperty('--modal-origin-y', originY);
+
+  requestAnimationFrame(() => categoryModal.classList.add('open'));
+  if (categoryModalTrigger) {
+    categoryModalTrigger.setAttribute('aria-expanded', 'true');
+  }
+};
 
 const syncCategoryTiles = (target = 'all', selectedTile = null) => {
   if (!categoryNavigation) return;
@@ -68,6 +306,7 @@ filterButtons.forEach((btn)=>{
 });
 
 if (categoryNavigation) {
+  renderSubcategoryPanel();
   categoryNavigation.querySelectorAll('[data-category-link]').forEach((tile)=>{
     tile.addEventListener('click', ()=>{
       const target = tile.dataset.filterTarget || 'all';
@@ -78,16 +317,45 @@ if (categoryNavigation) {
       setTimeout(() => tile.classList.remove('is-pressed'), 420);
 
       applyCatalogFilter(target, { animate: true, selectedTile: tile });
+      renderSubcategoryPanel(tile.dataset.subcategoryKey || target, scrollTarget);
 
-      if (scrollTarget) {
-        const destination = document.getElementById(scrollTarget);
-        if (destination) {
-          setTimeout(()=>destination.scrollIntoView({ behavior: 'smooth', block: 'start' }), 190);
-        }
-      }
     });
   });
 }
+
+if (categoryModalTrigger) {
+  categoryModalTrigger.addEventListener('click', () => {
+    if (categoryModal && categoryModal.classList.contains('open')) {
+      closeCategoryModal();
+      return;
+    }
+    openCategoryModal();
+    renderSubcategoryPanel();
+  });
+}
+
+if (categoryModal) {
+  categoryModal.querySelectorAll('[data-category-modal-close]').forEach((node) => {
+    node.addEventListener('click', closeCategoryModal);
+  });
+}
+
+document.addEventListener('click', (event) => {
+  if (!categoryModal || !categoryModal.classList.contains('open')) return;
+
+  const clickedTrigger = categoryModalTrigger && categoryModalTrigger.contains(event.target);
+  const clickedInsideDialog = categoryModalDialog && categoryModalDialog.contains(event.target);
+
+  if (!clickedTrigger && !clickedInsideDialog) {
+    closeCategoryModal();
+  }
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    closeCategoryModal();
+  }
+});
 
 const searchInput = document.querySelector('[data-search]');
 if(searchInput){
