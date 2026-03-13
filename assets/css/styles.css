@@ -115,9 +115,22 @@ button,input,textarea,select{font:inherit}
 .btn-primary:hover{box-shadow:0 18px 34px rgba(14,108,201,.34)}
 .btn-secondary{background:#fff;color:var(--text);border-color:var(--stroke)}
 .btn-secondary:hover{background:var(--surface-2)}
+.nav-actions .btn-secondary{
+  animation:requestQuotePulse 4.8s ease-in-out infinite;
+  box-shadow:0 0 0 0 rgba(14,108,201,0);
+}
+.nav-actions .btn-secondary:hover{
+  animation-play-state:paused;
+}
 .btn-dark{background:var(--text);color:#fff}
 .btn-warm{background:linear-gradient(135deg,var(--warm),#ff954f);color:#fff;box-shadow:0 14px 28px rgba(243,106,33,.24)}
 .btn-sm{min-height:42px;padding:0 16px;border-radius:13px;font-size:.95rem}
+
+@keyframes requestQuotePulse{
+  0%,72%,100%{transform:translateY(0) scale(1);box-shadow:0 0 0 0 rgba(14,108,201,0)}
+  78%{transform:translateY(-1px) scale(1.02);box-shadow:0 0 0 7px rgba(14,108,201,.12)}
+  84%{transform:translateY(0) scale(1);box-shadow:0 0 0 0 rgba(14,108,201,0)}
+}
 .pill,.tag,.chip{
   display:inline-flex;align-items:center;gap:8px;
   min-height:34px;padding:0 12px;border-radius:999px;font-size:.86rem;font-weight:700
@@ -667,6 +680,9 @@ button,input,textarea,select{font:inherit}
   .catalog-sidebar *{
     animation:none !important;
     transition:none !important;
+  }
+  .nav-actions .btn-secondary{
+    animation:none !important;
   }
 }
 
