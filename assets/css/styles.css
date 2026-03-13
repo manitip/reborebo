@@ -285,6 +285,9 @@ button,input,textarea,select{font:inherit}
 .product-thumb{
   aspect-ratio:16/10;background:linear-gradient(180deg,#f9fbff,#eaf3fc);border-bottom:1px solid var(--stroke);padding:16px
 }
+.product-thumb img{
+  width:100%;height:100%;object-fit:contain;display:block
+}
 .product-content{padding:22px}
 .product-meta{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:12px}
 .price{padding:10px 14px;border-radius:999px;background:var(--text);color:#fff;font-size:.92rem;font-weight:800;white-space:nowrap}
