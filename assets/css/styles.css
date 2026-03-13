@@ -403,7 +403,7 @@ button,input,textarea,select{font:inherit}
 .catalog-stack{position:relative}
 .catalog-category-modal{
   position:absolute;left:var(--modal-left,0);top:var(--modal-top,88px);z-index:30;
-  width:min(1080px,calc(100vw - 64px));
+  width:var(--modal-width,min(920px,calc(100vw - 40px)));max-width:100%;
   opacity:0;pointer-events:none
 }
 .catalog-category-modal.open{opacity:1;pointer-events:auto}
@@ -416,8 +416,9 @@ button,input,textarea,select{font:inherit}
 .catalog-category-modal.open::before{animation:modalTriggerBurst .48s ease-out}
 .catalog-category-modal__dialog{
   position:relative;width:100%;max-height:min(72vh,760px);overflow:auto;
-  padding:20px;border-radius:24px;background:linear-gradient(180deg,#fbfdff,#eef5ff);
-  border:1px solid #c7d8eb;box-shadow:0 20px 48px rgba(15,41,70,.24);
+  padding:20px;border-radius:24px;background:linear-gradient(180deg,rgba(251,253,255,.90),rgba(234,244,255,.84));
+  border:1px solid rgba(183,206,230,.92);backdrop-filter:blur(12px) saturate(120%);
+  box-shadow:0 20px 48px rgba(15,41,70,.20);
   transform:translate(var(--modal-from-x,0),var(--modal-from-y,-14px)) scale(var(--modal-from-scale,.04));
   opacity:0;filter:blur(2px);
   transform-origin:var(--modal-origin-x,50%) var(--modal-origin-y,0%)

@@ -44,22 +44,28 @@ const openCategoryModal = () => {
 
   const modalParentRect = categoryModal.offsetParent
     ? categoryModal.offsetParent.getBoundingClientRect()
-    : { left: 0, top: 0 };
+    : { left: 0, top: 0, width: window.innerWidth };
 
   if (categoryModalTrigger) {
     const triggerRect = categoryModalTrigger.getBoundingClientRect();
-    const estimatedWidth = Math.min(1080, Math.max(320, window.innerWidth - 64));
-    const maxLeft = Math.max(0, window.innerWidth - estimatedWidth - 20);
-    const modalLeft = Math.min(Math.max(0, triggerRect.left - modalParentRect.left), maxLeft);
+    const parentWidth = Math.max(320, modalParentRect.width || window.innerWidth);
+    const modalWidth = Math.min(920, parentWidth, Math.max(320, window.innerWidth - 40));
+
+    const rawLeft = triggerRect.right - modalParentRect.left - modalWidth;
+    const maxLeft = Math.max(0, parentWidth - modalWidth);
+    const modalLeft = Math.min(Math.max(0, rawLeft), maxLeft);
     const modalTop = triggerRect.bottom - modalParentRect.top + 10;
 
+    const triggerCenterLocalX = (triggerRect.left - modalParentRect.left - modalLeft) + (triggerRect.width / 2);
+
+    categoryModal.style.setProperty('--modal-width', `${modalWidth}px`);
     categoryModal.style.setProperty('--modal-left', `${modalLeft}px`);
     categoryModal.style.setProperty('--modal-top', `${Math.max(0, modalTop)}px`);
-    categoryModal.style.setProperty('--modal-trigger-local-x', `${triggerRect.width / 2}px`);
+    categoryModal.style.setProperty('--modal-trigger-local-x', `${triggerCenterLocalX}px`);
 
     offsetX = 0;
-    offsetY = -18;
-    originX = `${Math.max(12, Math.min(88, 50)).toFixed(2)}%`;
+    offsetY = -20;
+    originX = `${Math.max(10, Math.min(90, (triggerCenterLocalX / modalWidth) * 100)).toFixed(2)}%`;
     originY = '0%';
   }
 
