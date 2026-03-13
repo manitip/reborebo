@@ -154,13 +154,17 @@ button,input,textarea,select{font:inherit}
   background-size:220% 100%,140% 300%;
   background-position:0% 50%,0% 50%;
   filter:blur(.2px);
-  animation:eyebrow-gradient-shift 3.2s ease-in-out infinite;
+  animation:eyebrow-gradient-shift 4.9s cubic-bezier(.62,.02,.37,1.08) infinite alternate;
 }
 @keyframes eyebrow-gradient-shift{
-  0%{background-position:0% 50%,0% 50%}
-  45%{background-position:100% 50%,90% 18%}
-  70%{background-position:70% 50%,55% 82%}
-  100%{background-position:0% 50%,18% 38%}
+  0%{background-position:4% 52%,10% 56%}
+  13%{background-position:78% 46%,92% 14%}
+  24%{background-position:36% 58%,22% 86%}
+  41%{background-position:110% 44%,74% 28%}
+  57%{background-position:62% 50%,58% 82%}
+  69%{background-position:88% 56%,16% 42%}
+  83%{background-position:28% 48%,84% 66%}
+  100%{background-position:96% 52%,26% 22%}
 }
 @media (prefers-reduced-motion:reduce){
   .eyebrow::before,.check-list li::before,.lead-list li::before{animation:none}
@@ -402,14 +406,18 @@ button,input,textarea,select{font:inherit}
   background-position:50% 50%,24% 50%,50% 50%;
   box-shadow:0 0 7px rgba(243,106,33,.22),0 0 6px rgba(14,108,201,.18);
   filter:blur(.15px);
-  animation:list-dot-gradient-wander 3.1s ease-in-out infinite;
+  animation:list-dot-gradient-wander 4.6s cubic-bezier(.55,.08,.4,.97) infinite alternate;
 }
 @keyframes list-dot-gradient-wander{
-  0%{background-position:50% 50%,18% 52%,50% 50%}
-  24%{background-position:70% 28%,50% 50%,50% 50%}
-  50%{background-position:82% 50%,50% 50%,50% 50%}
-  74%{background-position:50% 50%,72% 74%,50% 50%}
-  100%{background-position:50% 50%,18% 52%,50% 50%}
+  0%{background-position:18% 54%,76% 44%,50% 50%}
+  11%{background-position:68% 22%,24% 74%,46% 42%}
+  23%{background-position:84% 58%,54% 18%,56% 62%}
+  37%{background-position:38% 80%,82% 26%,44% 70%}
+  49%{background-position:72% 46%,16% 46%,58% 48%}
+  63%{background-position:26% 30%,68% 82%,42% 40%}
+  79%{background-position:88% 74%,36% 20%,60% 60%}
+  91%{background-position:44% 16%,86% 58%,48% 56%}
+  100%{background-position:18% 54%,76% 44%,50% 50%}
 }
 .quote-banner{
   padding:34px;background:linear-gradient(135deg,#17324e,#0f5b9f);color:#fff;overflow:hidden;position:relative
