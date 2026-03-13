@@ -22,6 +22,146 @@ const categoryModal = document.querySelector('[data-category-modal]');
 const categoryModalTrigger = document.querySelector('[data-category-modal-trigger]');
 const categoryModalDialog = categoryModal ? categoryModal.querySelector('.catalog-category-modal__dialog') : null;
 
+const subcategoryPanelTitle = categoryModal ? categoryModal.querySelector('[data-subcategory-title]') : null;
+const subcategoryPanelList = categoryModal ? categoryModal.querySelector('[data-subcategory-list]') : null;
+
+const subcategoryCatalog = {
+  all: {
+    title: 'Весь каталог',
+    items: ['Выберите конкретную категорию слева, чтобы увидеть её подкатегории.']
+  },
+  materials: {
+    title: 'Сварочные материалы',
+    items: [
+      'Для легированных, высокопрочных и теплоустойчивых сталей',
+      'Для сварки углеродистых и низколегированных сталей',
+      'Для наплавки и ремонта деталей',
+      'Для сварки сплавов цветных металлов',
+      'Вольфрамовые, угольные электроды',
+      'Для сварки чугуна'
+    ]
+  },
+  chemistry: {
+    title: 'Техническая химия',
+    items: [
+      'Средства для травления и очистки нержавейки',
+      'Средства против налипания брызг',
+      'Средства для дефектоскопии (пенетранты)',
+      'Охлаждающий агент',
+      'Средства для травления и очистки алюминия',
+      'Кислотостойкие кисти'
+    ]
+  },
+  equipment: {
+    title: 'Сварочное оборудование',
+    items: [
+      'Сварочные инверторы MMA',
+      'Установки плазменной резки',
+      'Сварочные полуавтоматы MIG',
+      'Сварочные генераторы и агрегаты',
+      'Сварочные аргонодуговые аппараты TIG',
+      'Комплектующие для электросварки',
+      'Центраторы',
+      'Шланг-пакеты'
+    ]
+  },
+  protection: {
+    title: 'Средства защиты',
+    items: [
+      'Для защиты рук',
+      'Сварочные маски',
+      'Для защиты органов зрения',
+      'Для защиты органов слуха',
+      'Защитная одежда',
+      'Для защиты органов дыхания',
+      'Для защиты головы'
+    ]
+  },
+  abrasive: {
+    title: 'Абразивные материалы и инструмент',
+    items: [
+      'Круги фибровые',
+      'Круги шлифовальные (зачистные)',
+      'Круги лепестковые',
+      'Борфрезы (шарошки)',
+      'Круги отрезные'
+    ]
+  },
+  automation: {
+    title: 'Автоматизация и роботизация',
+    items: [
+      'Портальные установки с ЧПУ для резки различных материалов',
+      'Комплектующие автоматизации и роботизации',
+      'Сварочные трактора',
+      'Орбитальная сварка',
+      'Лазерная сварка'
+    ]
+  },
+  gas: {
+    title: 'Газопламенное оборудование',
+    items: [
+      'Портативные установки резаки по металлу',
+      'Комплектующие для газосварки',
+      'Редукторы, регуляторы газовые, подогреватели',
+      'Резаки газовые',
+      'Горелки газовые'
+    ]
+  },
+  workplace: {
+    title: 'Оборудование места сварщика',
+    items: [
+      'Наборы для организации сварочного поста',
+      'Оснастка',
+      'Сварочно-монтажные столы и приспособления',
+      'Защитные шторы и кабинки CEPRO',
+      'Фильтровентиляционное оборудование'
+    ]
+  },
+  torches: {
+    title: 'Горелки и ЗИП',
+    items: [
+      'Горелки MIG сварка',
+      'Горелки TIG сварка',
+      'Плазмотроны CUT',
+      'ЗИП MIG сварка',
+      'ЗИП TIG сварка',
+      'ЗИП CUT'
+    ]
+  },
+  gouging: {
+    title: 'Строгачи и угольные электроды',
+    items: [
+      'Строгачи',
+      'Бесконечные угольные электроды (с ниппелем) омеднённые',
+      'Круглые угольные электроды омеднённые',
+      'Плоские угольные омеднённые',
+      'Полукруглые угольные омеднённые'
+    ]
+  },
+  lathe: {
+    title: 'Токарное оборудование',
+    items: [
+      'На странице каталога отдельные подкатегории для этого раздела не указаны',
+      'После заголовка сразу идёт список товаров'
+    ]
+  }
+};
+
+const renderSubcategoryPanel = (key = 'all') => {
+  if (!subcategoryPanelTitle || !subcategoryPanelList) return;
+
+  const payload = subcategoryCatalog[key] || subcategoryCatalog.all;
+  subcategoryPanelTitle.textContent = payload.title;
+  subcategoryPanelList.innerHTML = '';
+
+  payload.items.forEach((item, index) => {
+    const li = document.createElement('li');
+    li.textContent = item;
+    li.style.animationDelay = `${index * 40}ms`;
+    subcategoryPanelList.append(li);
+  });
+};
+
 const closeCategoryModal = () => {
   if (!categoryModal || !categoryModal.classList.contains('open')) return;
   categoryModal.classList.remove('open');
@@ -130,6 +270,7 @@ filterButtons.forEach((btn)=>{
 });
 
 if (categoryNavigation) {
+  renderSubcategoryPanel();
   categoryNavigation.querySelectorAll('[data-category-link]').forEach((tile)=>{
     tile.addEventListener('click', ()=>{
       const target = tile.dataset.filterTarget || 'all';
@@ -140,6 +281,7 @@ if (categoryNavigation) {
       setTimeout(() => tile.classList.remove('is-pressed'), 420);
 
       applyCatalogFilter(target, { animate: true, selectedTile: tile });
+      renderSubcategoryPanel(tile.dataset.subcategoryKey || target);
 
       if (scrollTarget) {
         const destination = document.getElementById(scrollTarget);
@@ -148,7 +290,6 @@ if (categoryNavigation) {
         }
       }
 
-      closeCategoryModal();
     });
   });
 }
@@ -160,6 +301,7 @@ if (categoryModalTrigger) {
       return;
     }
     openCategoryModal();
+    renderSubcategoryPanel();
   });
 }
 

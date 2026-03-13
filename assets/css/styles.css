@@ -442,6 +442,8 @@ button,input,textarea,select{font:inherit}
   content:'';display:inline-block;width:34px;height:3px;border-radius:999px;
   background:linear-gradient(90deg,#ff7e2c,#3e95de);margin:0 10px 4px 0;vertical-align:middle
 }
+.catalog-category-layout{display:grid;grid-template-columns:1.05fr .95fr;gap:14px;align-items:start}
+.catalog-category-modal .catalog-assortment-nav{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .catalog-category-modal__close{
   width:38px;height:38px;border-radius:12px;display:grid;place-items:center;cursor:pointer;
   border:1px solid rgba(150,190,229,.55);background:rgba(240,248,255,.24);color:#f2f7ff;transition:all .25s ease
@@ -459,6 +461,31 @@ button,input,textarea,select{font:inherit}
   border-color:rgba(202,229,255,.92);color:#fff;box-shadow:0 12px 24px rgba(80,164,238,.24)
 }
 .catalog-category-modal .assortment-tile.active .assortment-icon{color:#fff}
+.catalog-subcategory-panel{
+  border:1px solid rgba(171,206,236,.38);border-radius:18px;padding:14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(187,220,248,.09));
+  animation:subcategoryPanelFade .28s ease both
+}
+.catalog-subcategory-eyebrow{margin:0;color:#b5d9f8;font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.catalog-subcategory-panel h3{margin:8px 0 10px;color:#fff;font-size:1.18rem}
+.catalog-subcategory-list{margin:0;padding:0;display:grid;gap:8px}
+.catalog-subcategory-list li{
+  list-style:none;padding:10px 12px 10px 20px;border-radius:12px;position:relative;
+  border:1px solid rgba(176,208,235,.38);background:rgba(255,255,255,.10);color:#eaf6ff;
+  line-height:1.35;font-size:.9rem;animation:subcategoryItemIn .3s ease both
+}
+.catalog-subcategory-list li::before{
+  content:'';position:absolute;left:10px;top:15px;width:5px;height:5px;border-radius:50%;
+  background:linear-gradient(135deg,#ff9a53,#72bbff)
+}
+@keyframes subcategoryPanelFade{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:none}
+}
+@keyframes subcategoryItemIn{
+  from{opacity:0;transform:translateY(5px)}
+  to{opacity:1;transform:none}
+}
 .assortment-tile{
   position:relative;overflow:hidden;display:flex;align-items:center;gap:12px;width:100%;padding:16px 14px;border-radius:18px;
   border:1px solid var(--stroke);background:linear-gradient(180deg,#ffffff,#f6faff);color:#1c2f45;font-weight:700;cursor:pointer;
@@ -529,6 +556,7 @@ button,input,textarea,select{font:inherit}
   .mobile-toggle{display:grid;place-items:center}
   .nav-actions .btn-secondary{display:none}
   .metric-grid,.grid-2,.grid-3,.grid-4,.grid-5,.stats-band,.product-grid,.project-grid,.news-grid,.brand-grid,.footer-grid,.process,.mini-metrics,.thumb-grid{grid-template-columns:1fr}
+  .catalog-category-layout{grid-template-columns:1fr}
   .catalog-assortment-nav{grid-template-columns:1fr}
   .catalog-categories-trigger{margin-left:0}
   .catalog-category-modal{left:0 !important;right:0;width:100%;top:calc(100% + 10px) !important}
