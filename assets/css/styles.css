@@ -148,13 +148,13 @@ button,input,textarea,select{font:inherit}
   width:34px;
   height:2px;
   border-radius:2px;
-  background:linear-gradient(90deg,var(--accent),var(--warm));
-  transform-origin:left center;
-  animation:eyebrow-line-pulse 2.2s ease-in-out infinite;
+  background:linear-gradient(90deg,var(--accent),var(--warm),var(--accent));
+  background-size:200% 100%;
+  animation:eyebrow-gradient-shift 1.8s linear infinite;
 }
-@keyframes eyebrow-line-pulse{
-  0%,100%{transform:scaleX(1);opacity:.85}
-  50%{transform:scaleX(.58);opacity:1}
+@keyframes eyebrow-gradient-shift{
+  0%{background-position:0% 50%}
+  100%{background-position:200% 50%}
 }
 @media (prefers-reduced-motion:reduce){
   .eyebrow::before{animation:none}
