@@ -18,6 +18,30 @@ document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 const categoryGrid = document.querySelector('.category-grid');
 const filterButtons = Array.from(document.querySelectorAll('[data-filter]'));
 const categoryNavigation = document.querySelector('[data-category-nav]');
+const categoryModal = document.querySelector('[data-category-modal]');
+const categoryModalTrigger = document.querySelector('[data-category-modal-trigger]');
+
+const closeCategoryModal = () => {
+  if (!categoryModal || !categoryModal.classList.contains('open')) return;
+  categoryModal.classList.remove('open');
+  setTimeout(() => {
+    categoryModal.hidden = true;
+  }, 320);
+  if (categoryModalTrigger) {
+    categoryModalTrigger.setAttribute('aria-expanded', 'false');
+  }
+  document.body.style.overflow = '';
+};
+
+const openCategoryModal = () => {
+  if (!categoryModal) return;
+  categoryModal.hidden = false;
+  requestAnimationFrame(() => categoryModal.classList.add('open'));
+  if (categoryModalTrigger) {
+    categoryModalTrigger.setAttribute('aria-expanded', 'true');
+  }
+  document.body.style.overflow = 'hidden';
+};
 
 const syncCategoryTiles = (target = 'all', selectedTile = null) => {
   if (!categoryNavigation) return;
@@ -85,9 +109,33 @@ if (categoryNavigation) {
           setTimeout(()=>destination.scrollIntoView({ behavior: 'smooth', block: 'start' }), 190);
         }
       }
+
+      closeCategoryModal();
     });
   });
 }
+
+if (categoryModalTrigger) {
+  categoryModalTrigger.addEventListener('click', () => {
+    if (categoryModal && categoryModal.classList.contains('open')) {
+      closeCategoryModal();
+      return;
+    }
+    openCategoryModal();
+  });
+}
+
+if (categoryModal) {
+  categoryModal.querySelectorAll('[data-category-modal-close]').forEach((node) => {
+    node.addEventListener('click', closeCategoryModal);
+  });
+}
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    closeCategoryModal();
+  }
+});
 
 const searchInput = document.querySelector('[data-search]');
 if(searchInput){
