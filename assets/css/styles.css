@@ -417,10 +417,10 @@ button,input,textarea,select{font:inherit}
 .catalog-category-modal__dialog{
   position:relative;width:100%;max-height:min(72vh,760px);overflow:auto;
   padding:20px;border-radius:24px;background:
-    radial-gradient(circle at 88% 66%,rgba(61,149,232,.32) 0%,rgba(30,113,191,0) 38%),
-    linear-gradient(180deg,rgba(14,67,118,.78),rgba(12,53,96,.70));
-  border:1px solid rgba(125,173,220,.42);backdrop-filter:blur(9px) saturate(108%);
-  box-shadow:0 16px 38px rgba(8,27,49,.22);
+    radial-gradient(circle at 88% 66%,rgba(61,149,232,.24) 0%,rgba(30,113,191,0) 38%),
+    linear-gradient(180deg,rgba(14,67,118,.60),rgba(12,53,96,.52));
+  border:1px solid rgba(125,173,220,.34);backdrop-filter:blur(8px) saturate(104%);
+  box-shadow:0 14px 30px rgba(8,27,49,.16);
   transform:translate(var(--modal-from-x,0),var(--modal-from-y,-14px)) scale(var(--modal-from-scale,.04));
   opacity:0;filter:blur(2px);
   transform-origin:var(--modal-origin-x,50%) var(--modal-origin-y,0%)
@@ -449,13 +449,13 @@ button,input,textarea,select{font:inherit}
 .catalog-category-modal__close:hover{transform:translateY(-1px);border-color:#d2e7ff;box-shadow:0 10px 20px rgba(14,108,201,.22)}
 .catalog-category-modal .assortment-tile{
   border-color:rgba(145,187,224,.42);
-  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(223,236,250,.10));
+  background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(223,236,250,.07));
   color:#eef6ff
 }
 .catalog-category-modal .assortment-icon{color:#dcecff}
 .catalog-category-modal .assortment-tile:hover{border-color:rgba(191,221,247,.7);box-shadow:0 12px 24px rgba(8,31,56,.24)}
 .catalog-category-modal .assortment-tile.active{
-  background:linear-gradient(135deg,rgba(255,255,255,.32),rgba(161,210,255,.28));
+  background:linear-gradient(135deg,rgba(255,255,255,.24),rgba(161,210,255,.20));
   border-color:rgba(202,229,255,.92);color:#fff;box-shadow:0 12px 24px rgba(80,164,238,.24)
 }
 .catalog-category-modal .assortment-tile.active .assortment-icon{color:#fff}
