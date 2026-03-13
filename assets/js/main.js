@@ -974,4 +974,73 @@ const initRequestBuilder = () => {
   persistAndRender(getRequestItems());
 };
 
+
+const initDeliveryDropdown = () => {
+  const root = document.querySelector('[data-delivery-dropdown]');
+  if (!root) return;
+
+  const trigger = root.querySelector('[data-delivery-trigger]');
+  const label = root.querySelector('[data-delivery-label]');
+  const valueField = root.querySelector('[data-delivery-value]');
+  const note = root.querySelector('[data-delivery-note]');
+  const options = Array.from(root.querySelectorAll('[data-delivery-option]'));
+
+  if (!trigger || !label || !valueField || options.length === 0) return;
+
+  const optionTitles = {
+    pickup: 'Самовывоз',
+    tk: 'Доставка через ТК'
+  };
+
+  const setValue = (value) => {
+    valueField.value = value;
+    label.textContent = optionTitles[value] || optionTitles.pickup;
+    options.forEach((option) => option.classList.toggle('is-active', option.dataset.deliveryOption === value));
+
+    if (note) {
+      const showNote = value === 'tk';
+      note.hidden = !showNote;
+      if (showNote) {
+        note.style.animation = 'none';
+        requestAnimationFrame(() => {
+          note.style.animation = '';
+        });
+      }
+    }
+  };
+
+  const closeDropdown = () => {
+    root.classList.remove('is-open');
+    trigger.setAttribute('aria-expanded', 'false');
+  };
+
+  trigger.addEventListener('click', () => {
+    const nextOpen = !root.classList.contains('is-open');
+    root.classList.toggle('is-open', nextOpen);
+    trigger.setAttribute('aria-expanded', String(nextOpen));
+  });
+
+  options.forEach((option) => {
+    option.addEventListener('click', () => {
+      setValue(option.dataset.deliveryOption || 'pickup');
+      closeDropdown();
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!root.contains(event.target)) {
+      closeDropdown();
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeDropdown();
+    }
+  });
+
+  setValue(valueField.value || 'pickup');
+};
+
 initRequestBuilder();
+initDeliveryDropdown();
