@@ -116,8 +116,9 @@ button,input,textarea,select{font:inherit}
 .btn-secondary{background:#fff;color:var(--text);border-color:var(--stroke)}
 .btn-secondary:hover{background:var(--surface-2)}
 .nav-actions .btn-secondary{
-  animation:requestQuotePulse 4.8s ease-in-out infinite;
+  animation:requestQuotePulse 3.1s cubic-bezier(.4,0,.2,1) infinite;
   box-shadow:0 0 0 0 rgba(14,108,201,0);
+  will-change:transform,box-shadow;
 }
 .nav-actions .btn-secondary:hover{
   animation-play-state:paused;
@@ -127,9 +128,9 @@ button,input,textarea,select{font:inherit}
 .btn-sm{min-height:42px;padding:0 16px;border-radius:13px;font-size:.95rem}
 
 @keyframes requestQuotePulse{
-  0%,72%,100%{transform:translateY(0) scale(1);box-shadow:0 0 0 0 rgba(14,108,201,0)}
-  78%{transform:translateY(-1px) scale(1.02);box-shadow:0 0 0 7px rgba(14,108,201,.12)}
-  84%{transform:translateY(0) scale(1);box-shadow:0 0 0 0 rgba(14,108,201,0)}
+  0%,100%{transform:translateY(0) scale(1);box-shadow:0 0 0 0 rgba(14,108,201,0)}
+  35%{transform:translateY(-.5px) scale(1.01);box-shadow:0 0 0 5px rgba(14,108,201,.10)}
+  60%{transform:translateY(0) scale(1.006);box-shadow:0 0 0 2px rgba(14,108,201,.07)}
 }
 .pill,.tag,.chip{
   display:inline-flex;align-items:center;gap:8px;
