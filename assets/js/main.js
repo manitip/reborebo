@@ -18,6 +18,61 @@ document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 const categoryGrid = document.querySelector('.category-grid');
 const filterButtons = Array.from(document.querySelectorAll('[data-filter]'));
 const categoryNavigation = document.querySelector('[data-category-nav]');
+const categoryModal = document.querySelector('[data-category-modal]');
+const categoryModalTrigger = document.querySelector('[data-category-modal-trigger]');
+const categoryModalDialog = categoryModal ? categoryModal.querySelector('.catalog-category-modal__dialog') : null;
+
+const closeCategoryModal = () => {
+  if (!categoryModal || !categoryModal.classList.contains('open')) return;
+  categoryModal.classList.remove('open');
+  setTimeout(() => {
+    categoryModal.hidden = true;
+  }, 320);
+  if (categoryModalTrigger) {
+    categoryModalTrigger.setAttribute('aria-expanded', 'false');
+  }
+  document.body.style.overflow = '';
+};
+
+const openCategoryModal = () => {
+  if (!categoryModal || !categoryModalDialog) return;
+  categoryModal.hidden = false;
+
+  let offsetX = 0;
+  let offsetY = 24;
+  let originX = '50%';
+  let originY = '50%';
+
+  if (categoryModalTrigger) {
+    const triggerRect = categoryModalTrigger.getBoundingClientRect();
+    const dialogRect = categoryModalDialog.getBoundingClientRect();
+
+    const triggerCenterX = triggerRect.left + triggerRect.width / 2;
+    const triggerCenterY = triggerRect.top + triggerRect.height / 2;
+    const dialogCenterX = dialogRect.left + dialogRect.width / 2;
+    const dialogCenterY = dialogRect.top + dialogRect.height / 2;
+
+    offsetX = triggerCenterX - dialogCenterX;
+    offsetY = triggerCenterY - dialogCenterY;
+
+    const originXPercent = dialogRect.width ? ((triggerCenterX - dialogRect.left) / dialogRect.width) * 100 : 50;
+    const originYPercent = dialogRect.height ? ((triggerCenterY - dialogRect.top) / dialogRect.height) * 100 : 50;
+    originX = `${Math.max(8, Math.min(92, originXPercent)).toFixed(2)}%`;
+    originY = `${Math.max(8, Math.min(92, originYPercent)).toFixed(2)}%`;
+  }
+
+  categoryModalDialog.style.setProperty('--modal-from-x', `${offsetX}px`);
+  categoryModalDialog.style.setProperty('--modal-from-y', `${offsetY}px`);
+  categoryModalDialog.style.setProperty('--modal-from-scale', '0.18');
+  categoryModalDialog.style.setProperty('--modal-origin-x', originX);
+  categoryModalDialog.style.setProperty('--modal-origin-y', originY);
+
+  requestAnimationFrame(() => categoryModal.classList.add('open'));
+  if (categoryModalTrigger) {
+    categoryModalTrigger.setAttribute('aria-expanded', 'true');
+  }
+  document.body.style.overflow = 'hidden';
+};
 
 const syncCategoryTiles = (target = 'all', selectedTile = null) => {
   if (!categoryNavigation) return;
@@ -85,9 +140,33 @@ if (categoryNavigation) {
           setTimeout(()=>destination.scrollIntoView({ behavior: 'smooth', block: 'start' }), 190);
         }
       }
+
+      closeCategoryModal();
     });
   });
 }
+
+if (categoryModalTrigger) {
+  categoryModalTrigger.addEventListener('click', () => {
+    if (categoryModal && categoryModal.classList.contains('open')) {
+      closeCategoryModal();
+      return;
+    }
+    openCategoryModal();
+  });
+}
+
+if (categoryModal) {
+  categoryModal.querySelectorAll('[data-category-modal-close]').forEach((node) => {
+    node.addEventListener('click', closeCategoryModal);
+  });
+}
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    closeCategoryModal();
+  }
+});
 
 const searchInput = document.querySelector('[data-search]');
 if(searchInput){
