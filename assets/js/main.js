@@ -20,6 +20,8 @@ const brandWeld = document.querySelector('[data-brand-weld]');
 if (brandWeld) {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const sessionKey = 'comtrade-brand-weld-played';
+  const mobileView = window.matchMedia('(max-width: 900px)').matches;
+  const animationDuration = mobileView ? 1900 : 2450;
 
   const completeBrandAnimation = () => {
     brandWeld.classList.remove('is-playing');
@@ -34,7 +36,7 @@ if (brandWeld) {
 
       brandWeld.classList.add('is-playing');
       sessionStorage.setItem(sessionKey, '1');
-      window.setTimeout(completeBrandAnimation, 2500);
+      window.setTimeout(completeBrandAnimation, animationDuration);
     };
 
     if ('IntersectionObserver' in window) {
