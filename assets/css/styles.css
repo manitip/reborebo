@@ -395,19 +395,21 @@ button,input,textarea,select{font:inherit}
   content:"";width:14px;height:14px;border-radius:50%;
   margin-top:6px;flex:0 0 auto;
   background:
-    radial-gradient(circle at center, rgba(14,108,201,.82) 0%, rgba(243,106,33,.17) 58%, rgba(14,108,201,0) 100%),
-    radial-gradient(circle, rgba(243,106,33,.65) 0%, rgba(243,106,33,.29) 38%, rgba(243,106,33,0) 65%);
-  background-size:100% 100%,190% 190%;
-  background-position:50% 50%,24% 50%;
-  box-shadow:0 0 7px rgba(243,106,33,.26);
+    radial-gradient(circle, rgba(14,108,201,.78) 0%, rgba(14,108,201,.18) 36%, rgba(14,108,201,0) 62%),
+    radial-gradient(circle, rgba(243,106,33,.62) 0%, rgba(243,106,33,.22) 38%, rgba(243,106,33,0) 66%),
+    radial-gradient(circle at center, rgba(14,108,201,.34) 0%, rgba(243,106,33,.26) 56%, rgba(14,108,201,0) 100%);
+  background-size:185% 185%,185% 185%,100% 100%;
+  background-position:50% 50%,24% 50%,50% 50%;
+  box-shadow:0 0 7px rgba(243,106,33,.22),0 0 6px rgba(14,108,201,.18);
   filter:blur(.15px);
-  animation:list-dot-gradient-wander 2.8s ease-in-out infinite;
+  animation:list-dot-gradient-wander 3.1s ease-in-out infinite;
 }
 @keyframes list-dot-gradient-wander{
-  0%{background-position:50% 50%,24% 50%}
-  30%{background-position:50% 50%,72% 24%}
-  62%{background-position:50% 50%,68% 78%}
-  100%{background-position:50% 50%,24% 50%}
+  0%{background-position:50% 50%,18% 52%,50% 50%}
+  24%{background-position:70% 28%,50% 50%,50% 50%}
+  50%{background-position:82% 50%,50% 50%,50% 50%}
+  74%{background-position:50% 50%,72% 74%,50% 50%}
+  100%{background-position:50% 50%,18% 52%,50% 50%}
 }
 .quote-banner{
   padding:34px;background:linear-gradient(135deg,#17324e,#0f5b9f);color:#fff;overflow:hidden;position:relative
