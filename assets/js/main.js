@@ -42,13 +42,15 @@ const openCategoryModal = () => {
   let offsetY = 24;
   let originX = '50%';
   let originY = '50%';
+  let triggerCenterX = window.innerWidth / 2;
+  let triggerCenterY = window.innerHeight / 2;
 
+  const dialogRect = categoryModalDialog.getBoundingClientRect();
   if (categoryModalTrigger) {
     const triggerRect = categoryModalTrigger.getBoundingClientRect();
-    const dialogRect = categoryModalDialog.getBoundingClientRect();
+    triggerCenterX = triggerRect.left + triggerRect.width / 2;
+    triggerCenterY = triggerRect.top + triggerRect.height / 2;
 
-    const triggerCenterX = triggerRect.left + triggerRect.width / 2;
-    const triggerCenterY = triggerRect.top + triggerRect.height / 2;
     const dialogCenterX = dialogRect.left + dialogRect.width / 2;
     const dialogCenterY = dialogRect.top + dialogRect.height / 2;
 
@@ -61,9 +63,11 @@ const openCategoryModal = () => {
     originY = `${Math.max(8, Math.min(92, originYPercent)).toFixed(2)}%`;
   }
 
+  categoryModal.style.setProperty('--modal-trigger-x', `${triggerCenterX}px`);
+  categoryModal.style.setProperty('--modal-trigger-y', `${triggerCenterY}px`);
   categoryModalDialog.style.setProperty('--modal-from-x', `${offsetX}px`);
   categoryModalDialog.style.setProperty('--modal-from-y', `${offsetY}px`);
-  categoryModalDialog.style.setProperty('--modal-from-scale', '0.18');
+  categoryModalDialog.style.setProperty('--modal-from-scale', '0.06');
   categoryModalDialog.style.setProperty('--modal-origin-x', originX);
   categoryModalDialog.style.setProperty('--modal-origin-y', originY);
 
