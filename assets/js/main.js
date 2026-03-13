@@ -966,12 +966,142 @@ const initRequestBuilder = () => {
   };
 
   addEmptyButton.addEventListener('click', () => {
-    const draftItems = getRequestItems();
-    draftItems.push({ name: '', qty: 1 });
-    persistAndRender(draftItems);
+    window.location.href = 'catalog.html';
   });
 
   persistAndRender(getRequestItems());
 };
 
+
+
+const initFormDropdowns = () => {
+  const dropdowns = Array.from(document.querySelectorAll('[data-form-dropdown]'));
+  if (dropdowns.length === 0) return;
+
+  dropdowns.forEach((root) => {
+    const trigger = root.querySelector('[data-dropdown-trigger]');
+    const label = root.querySelector('[data-dropdown-label]');
+    const valueField = root.querySelector('[data-dropdown-value]');
+    const options = Array.from(root.querySelectorAll('[data-dropdown-option]'));
+
+    if (!trigger || !label || !valueField || options.length === 0) return;
+
+    const syncValue = (value) => {
+      const selectedOption = options.find((option) => option.dataset.dropdownOption === value) || options[0];
+      const nextValue = selectedOption.dataset.dropdownOption || '';
+      valueField.value = nextValue;
+      label.textContent = selectedOption.textContent;
+      options.forEach((option) => option.classList.toggle('is-active', option === selectedOption));
+    };
+
+    const closeDropdown = () => {
+      root.classList.remove('is-open');
+      trigger.setAttribute('aria-expanded', 'false');
+    };
+
+    trigger.addEventListener('click', () => {
+      const nextOpen = !root.classList.contains('is-open');
+      dropdowns.forEach((item) => {
+        item.classList.remove('is-open');
+        const itemTrigger = item.querySelector('[data-dropdown-trigger]');
+        if (itemTrigger) {
+          itemTrigger.setAttribute('aria-expanded', 'false');
+        }
+      });
+      root.classList.toggle('is-open', nextOpen);
+      trigger.setAttribute('aria-expanded', String(nextOpen));
+    });
+
+    options.forEach((option) => {
+      option.addEventListener('click', () => {
+        syncValue(option.dataset.dropdownOption || '');
+        closeDropdown();
+      });
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!root.contains(event.target)) {
+        closeDropdown();
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeDropdown();
+      }
+    });
+
+    syncValue(valueField.value || options[0].dataset.dropdownOption || '');
+  });
+};
+
+const initDeliveryDropdown = () => {
+  const root = document.querySelector('[data-delivery-dropdown]');
+  if (!root) return;
+
+  const trigger = root.querySelector('[data-delivery-trigger]');
+  const label = root.querySelector('[data-delivery-label]');
+  const valueField = root.querySelector('[data-delivery-value]');
+  const note = root.querySelector('[data-delivery-note]');
+  const options = Array.from(root.querySelectorAll('[data-delivery-option]'));
+
+  if (!trigger || !label || !valueField || options.length === 0) return;
+
+  const optionTitles = {
+    pickup: 'Самовывоз',
+    tk: 'Доставка через ТК'
+  };
+
+  const setValue = (value) => {
+    valueField.value = value;
+    label.textContent = optionTitles[value] || optionTitles.pickup;
+    options.forEach((option) => option.classList.toggle('is-active', option.dataset.deliveryOption === value));
+
+    if (note) {
+      const showNote = value === 'tk';
+      note.hidden = !showNote;
+      if (showNote) {
+        note.style.animation = 'none';
+        requestAnimationFrame(() => {
+          note.style.animation = '';
+        });
+      }
+    }
+  };
+
+  const closeDropdown = () => {
+    root.classList.remove('is-open');
+    trigger.setAttribute('aria-expanded', 'false');
+  };
+
+  trigger.addEventListener('click', () => {
+    const nextOpen = !root.classList.contains('is-open');
+    root.classList.toggle('is-open', nextOpen);
+    trigger.setAttribute('aria-expanded', String(nextOpen));
+  });
+
+  options.forEach((option) => {
+    option.addEventListener('click', () => {
+      setValue(option.dataset.deliveryOption || 'pickup');
+      closeDropdown();
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!root.contains(event.target)) {
+      closeDropdown();
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeDropdown();
+    }
+  });
+
+  setValue(valueField.value || 'pickup');
+};
+
 initRequestBuilder();
+initFormDropdowns();
+initDeliveryDropdown();
