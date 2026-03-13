@@ -101,6 +101,21 @@
               <option>Оснастка и инженерный проект</option>
             </select>
 
+            <div class="delivery-dropdown" data-delivery-dropdown>
+              <input type="hidden" name="delivery_method" value="pickup" data-delivery-value>
+              <button class="delivery-dropdown-trigger" type="button" aria-expanded="false" data-delivery-trigger>
+                <span data-delivery-label>Самовывоз</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <div class="delivery-dropdown-panel" data-delivery-panel>
+                <button type="button" class="delivery-dropdown-option is-active" data-delivery-option="pickup">Самовывоз</button>
+                <button type="button" class="delivery-dropdown-option" data-delivery-option="tk">Доставка через ТК</button>
+              </div>
+              <p class="delivery-dropdown-note" hidden data-delivery-note>Стоимость доставки будет добавлена к счету.</p>
+            </div>
+
             <div class="request-builder" data-request-builder>
               <div class="request-builder-head">
                 <h3>Позиции в заявке</h3>
