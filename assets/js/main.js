@@ -975,6 +975,68 @@ const initRequestBuilder = () => {
 };
 
 
+
+const initFormDropdowns = () => {
+  const dropdowns = Array.from(document.querySelectorAll('[data-form-dropdown]'));
+  if (dropdowns.length === 0) return;
+
+  dropdowns.forEach((root) => {
+    const trigger = root.querySelector('[data-dropdown-trigger]');
+    const label = root.querySelector('[data-dropdown-label]');
+    const valueField = root.querySelector('[data-dropdown-value]');
+    const options = Array.from(root.querySelectorAll('[data-dropdown-option]'));
+
+    if (!trigger || !label || !valueField || options.length === 0) return;
+
+    const syncValue = (value) => {
+      const selectedOption = options.find((option) => option.dataset.dropdownOption === value) || options[0];
+      const nextValue = selectedOption.dataset.dropdownOption || '';
+      valueField.value = nextValue;
+      label.textContent = selectedOption.textContent;
+      options.forEach((option) => option.classList.toggle('is-active', option === selectedOption));
+    };
+
+    const closeDropdown = () => {
+      root.classList.remove('is-open');
+      trigger.setAttribute('aria-expanded', 'false');
+    };
+
+    trigger.addEventListener('click', () => {
+      const nextOpen = !root.classList.contains('is-open');
+      dropdowns.forEach((item) => {
+        item.classList.remove('is-open');
+        const itemTrigger = item.querySelector('[data-dropdown-trigger]');
+        if (itemTrigger) {
+          itemTrigger.setAttribute('aria-expanded', 'false');
+        }
+      });
+      root.classList.toggle('is-open', nextOpen);
+      trigger.setAttribute('aria-expanded', String(nextOpen));
+    });
+
+    options.forEach((option) => {
+      option.addEventListener('click', () => {
+        syncValue(option.dataset.dropdownOption || '');
+        closeDropdown();
+      });
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!root.contains(event.target)) {
+        closeDropdown();
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeDropdown();
+      }
+    });
+
+    syncValue(valueField.value || options[0].dataset.dropdownOption || '');
+  });
+};
+
 const initDeliveryDropdown = () => {
   const root = document.querySelector('[data-delivery-dropdown]');
   if (!root) return;
@@ -1043,4 +1105,5 @@ const initDeliveryDropdown = () => {
 };
 
 initRequestBuilder();
+initFormDropdowns();
 initDeliveryDropdown();
