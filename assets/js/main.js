@@ -28,6 +28,76 @@ let activeCategoryScrollTarget = '';
 
 const subcategoryDescription = categoryModal ? categoryModal.querySelector('[data-subcategory-description]') : null;
 
+
+const sidebarRoot = document.querySelector('[data-catalog-sidebar]');
+const sidebarCategories = document.querySelector('[data-sidebar-categories]');
+const sidebarSubcategories = document.querySelector('[data-sidebar-subcategories]');
+const sidebarScenarios = document.querySelector('[data-sidebar-scenarios]');
+const sidebarContextFilters = document.querySelector('[data-sidebar-context-filters]');
+const sidebarReset = document.querySelector('[data-sidebar-reset]');
+const sidebarOpenButton = document.querySelector('[data-sidebar-open]');
+const sidebarCloseButton = document.querySelector('[data-sidebar-close]');
+const sidebarBackdrop = document.querySelector('[data-sidebar-backdrop]');
+
+const catalogSidebarConfig = {
+  categories: [
+    {
+      id: 'materials',
+      title: 'Сварочные материалы',
+      filterTarget: 'materials',
+      scrollTarget: 'materials',
+      subcategories: ['Проволока MIG/MAG', 'Прутки TIG', 'Электроды MMA', 'Флюсы', 'Сварочные порошки']
+    },
+    {
+      id: 'chemistry',
+      title: 'Техническая химия',
+      filterTarget: 'materials',
+      scrollTarget: 'chemistry',
+      subcategories: ['Травильные пасты', 'Антиспаттер', 'Пенетранты', 'Очистка алюминия']
+    },
+    {
+      id: 'equipment',
+      title: 'Сварочное оборудование',
+      filterTarget: 'equipment',
+      scrollTarget: 'equipment',
+      subcategories: ['MIG/MAG полуавтоматы', 'TIG аппараты', 'Плазменная резка', 'Источники питания']
+    },
+    {
+      id: 'automation',
+      title: 'Автоматизация',
+      filterTarget: 'engineering',
+      scrollTarget: 'automation',
+      subcategories: ['Роботизированные комплексы', 'Интеграция в линии', 'Оснастка и трекинг']
+    },
+    {
+      id: 'workplace',
+      title: 'Рабочее место сварщика',
+      filterTarget: 'equipment',
+      scrollTarget: 'workplace',
+      subcategories: ['Столы и вытяжка', 'СИЗ', 'Горелки и комплектующие']
+    }
+  ],
+  scenarios: [
+    { id: 'production', title: 'Для производственного участка' },
+    { id: 'stainless', title: 'Для нержавеющей стали' },
+    { id: 'aluminum', title: 'Для алюминия' },
+    { id: 'automation', title: 'Для автоматизированной сварки' },
+    { id: 'post', title: 'Для комплектации поста' }
+  ],
+  contextFilters: {
+    materials: ['Материал', 'Тип сварки', 'Форма поставки', 'Диаметр', 'Назначение'],
+    equipment: ['Процесс сварки', 'Напряжение', 'Диапазон тока', 'Условия эксплуатации', 'Класс оборудования'],
+    chemistry: ['Назначение', 'Вид металла', 'Объём', 'Тип применения', 'Режим применения'],
+    engineering: ['Тип линии', 'Степень автоматизации', 'Нагрузка', 'Сервис']
+  }
+};
+
+const sidebarState = {
+  categoryId: 'materials',
+  scenarioId: '',
+  contextFilter: ''
+};
+
 const subcategoryCatalog = {
   all: {
     title: 'Весь каталог',
@@ -198,6 +268,166 @@ const renderSubcategoryPanel = (key = 'all', scrollTarget = '') => {
   updateDescription(payload.items[0] ? payload.items[0].description : '');
 };
 
+
+const getCategoryById = (id) => catalogSidebarConfig.categories.find((item) => item.id === id) || catalogSidebarConfig.categories[0];
+
+const updateSidebarUrl = () => {
+  if (!sidebarRoot) return;
+  const url = new URL(window.location.href);
+
+  if (sidebarState.scenarioId) {
+    url.searchParams.set('scenario', sidebarState.scenarioId);
+  } else {
+    url.searchParams.delete('scenario');
+  }
+
+  if (sidebarState.contextFilter) {
+    url.searchParams.set('context', sidebarState.contextFilter);
+  } else {
+    url.searchParams.delete('context');
+  }
+
+  if (sidebarState.categoryId) {
+    url.searchParams.set('category', sidebarState.categoryId);
+  }
+
+  window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+};
+
+const applySidebarStateToUI = () => {
+  if (!sidebarRoot) return;
+
+  const category = getCategoryById(sidebarState.categoryId);
+
+  if (sidebarCategories) {
+    sidebarCategories.querySelectorAll('.catalog-nav-btn').forEach((button) => {
+      button.classList.toggle('active', button.dataset.categoryId === sidebarState.categoryId);
+    });
+  }
+
+  if (sidebarSubcategories) {
+    sidebarSubcategories.hidden = !category.subcategories.length;
+    sidebarSubcategories.innerHTML = category.subcategories.length
+      ? `<p class="catalog-subnav-title">Подкатегории</p>${category.subcategories.map((sub)=>`<button type="button" class="catalog-subnav-btn" data-scroll-target="${category.scrollTarget}">${sub}</button>`).join('')}`
+      : '';
+
+    sidebarSubcategories.querySelectorAll('[data-scroll-target]').forEach((node) => {
+      node.addEventListener('click', () => {
+        const destination = document.getElementById(node.dataset.scrollTarget || '');
+        if (destination) destination.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (shouldAutoCloseSidebar()) closeCatalogSidebar();
+      });
+    });
+  }
+
+  if (sidebarContextFilters) {
+    const filters = catalogSidebarConfig.contextFilters[category.id] || [];
+    sidebarContextFilters.innerHTML = filters.map((item) => `<button type="button" class="catalog-context-chip ${sidebarState.contextFilter === item ? 'active' : ''}" data-context-filter="${item}">${item}</button>`).join('');
+
+    sidebarContextFilters.querySelectorAll('[data-context-filter]').forEach((node) => {
+      node.addEventListener('click', () => {
+        sidebarState.contextFilter = sidebarState.contextFilter === node.dataset.contextFilter ? '' : (node.dataset.contextFilter || '');
+        applySidebarStateToUI();
+        updateSidebarUrl();
+      });
+    });
+  }
+
+  if (sidebarScenarios) {
+    sidebarScenarios.querySelectorAll('.catalog-chip').forEach((chip) => {
+      chip.classList.toggle('active', chip.dataset.scenario === sidebarState.scenarioId);
+    });
+  }
+
+  if (sidebarReset) {
+    sidebarReset.hidden = !(sidebarState.scenarioId || sidebarState.contextFilter);
+  }
+};
+
+const applySidebarCategory = (categoryId, syncFilter = true) => {
+  const category = getCategoryById(categoryId);
+  sidebarState.categoryId = category.id;
+
+  if (syncFilter) {
+    applyCatalogFilter(category.filterTarget || 'all', { animate: true });
+  }
+
+  applySidebarStateToUI();
+  updateSidebarUrl();
+};
+
+const shouldAutoCloseSidebar = () => window.matchMedia('(max-width: 860px)').matches;
+
+const closeCatalogSidebar = () => {
+  if (!sidebarRoot) return;
+  sidebarRoot.classList.remove('open');
+  document.body.classList.remove('sidebar-open');
+  if (sidebarBackdrop) sidebarBackdrop.classList.remove('open');
+};
+
+const openCatalogSidebar = () => {
+  if (!sidebarRoot) return;
+  sidebarRoot.classList.add('open');
+  document.body.classList.add('sidebar-open');
+  if (sidebarBackdrop) sidebarBackdrop.classList.add('open');
+};
+
+const renderCatalogSidebar = () => {
+  if (!sidebarRoot || !sidebarCategories || !sidebarScenarios) return;
+
+  sidebarCategories.innerHTML = catalogSidebarConfig.categories
+    .map((category) => `<button type="button" class="catalog-nav-btn" data-category-id="${category.id}">${category.title}</button>`)
+    .join('');
+
+  sidebarScenarios.innerHTML = catalogSidebarConfig.scenarios
+    .map((scenario) => `<button type="button" class="catalog-chip" data-scenario="${scenario.id}">${scenario.title}</button>`)
+    .join('');
+
+  sidebarCategories.querySelectorAll('[data-category-id]').forEach((button) => {
+    button.addEventListener('click', () => {
+      applySidebarCategory(button.dataset.categoryId || 'materials');
+      if (shouldAutoCloseSidebar()) closeCatalogSidebar();
+    });
+  });
+
+  sidebarScenarios.querySelectorAll('[data-scenario]').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      sidebarState.scenarioId = sidebarState.scenarioId === chip.dataset.scenario ? '' : (chip.dataset.scenario || '');
+      applySidebarStateToUI();
+      updateSidebarUrl();
+      if (shouldAutoCloseSidebar()) closeCatalogSidebar();
+    });
+  });
+
+  if (sidebarReset) {
+    sidebarReset.addEventListener('click', () => {
+      sidebarState.scenarioId = '';
+      sidebarState.contextFilter = '';
+      applySidebarStateToUI();
+      updateSidebarUrl();
+    });
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  sidebarState.categoryId = params.get('category') || sidebarState.categoryId;
+  sidebarState.scenarioId = params.get('scenario') || '';
+  sidebarState.contextFilter = params.get('context') || '';
+
+  applySidebarCategory(sidebarState.categoryId, true);
+
+  if (sidebarOpenButton) {
+    sidebarOpenButton.addEventListener('click', openCatalogSidebar);
+  }
+
+  if (sidebarCloseButton) {
+    sidebarCloseButton.addEventListener('click', closeCatalogSidebar);
+  }
+
+  if (sidebarBackdrop) {
+    sidebarBackdrop.addEventListener('click', closeCatalogSidebar);
+  }
+};
+
 const closeCategoryModal = () => {
   if (!categoryModal || !categoryModal.classList.contains('open')) return;
   categoryModal.classList.remove('open');
@@ -305,6 +535,8 @@ filterButtons.forEach((btn)=>{
   });
 });
 
+renderCatalogSidebar();
+
 if (categoryNavigation) {
   renderSubcategoryPanel();
   categoryNavigation.querySelectorAll('[data-category-link]').forEach((tile)=>{
@@ -354,6 +586,7 @@ document.addEventListener('click', (event) => {
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     closeCategoryModal();
+    closeCatalogSidebar();
   }
 });
 
