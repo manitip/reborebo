@@ -966,9 +966,7 @@ const initRequestBuilder = () => {
   };
 
   addEmptyButton.addEventListener('click', () => {
-    const draftItems = getRequestItems();
-    draftItems.push({ name: '', qty: 1 });
-    persistAndRender(draftItems);
+    window.location.href = 'catalog.html';
   });
 
   persistAndRender(getRequestItems());
