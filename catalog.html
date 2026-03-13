@@ -87,31 +87,40 @@
 
   <section class="section">
     <div class="container catalog-shell">
-      <aside class="sidebar panel reveal">
-        <h3>Навигация по каталогу</h3>
-        <div class="tabs stack">
-          <a href="#materials">Сварочные материалы</a>
-          <a href="#chemistry">Техническая химия</a>
-          <a href="#equipment">Сварочное оборудование</a>
-          <a href="#automation">Автоматизация</a>
-          <a href="#workplace">Рабочее место сварщика</a>
+      <button type="button" class="catalog-sidebar-mobile-trigger" data-sidebar-open>Фильтры и подбор</button>
+
+      <aside class="sidebar panel reveal catalog-sidebar" data-catalog-sidebar>
+        <div class="catalog-sidebar-head">
+          <h3>Навигация по каталогу</h3>
+          <button type="button" class="catalog-sidebar-close" data-sidebar-close aria-label="Закрыть фильтры">✕</button>
         </div>
-        <div class="filter-group">
-          <h3>Быстрый подбор</h3>
-          <div class="checkbox-list">
-            <label><input type="checkbox"> Для производственного участка</label>
-            <label><input type="checkbox"> Для нержавеющей стали</label>
-            <label><input type="checkbox"> Для алюминия</label>
-            <label><input type="checkbox"> Для автоматизированной сварки</label>
-            <label><input type="checkbox"> Для комплектации поста</label>
-          </div>
+        <div class="catalog-sidebar-section">
+          <div class="catalog-nav-list" data-sidebar-categories></div>
+          <div class="catalog-subnav" data-sidebar-subcategories hidden></div>
         </div>
-        <div class="filter-group">
+
+        <div class="catalog-sidebar-section">
+          <h3>Подобрать под задачу</h3>
+          <div class="catalog-chip-list" data-sidebar-scenarios></div>
+          <div class="catalog-context-filters" data-sidebar-context-filters></div>
+          <button type="button" class="btn btn-secondary btn-sm" data-sidebar-reset hidden>Сбросить подбор</button>
+        </div>
+
+        <div class="catalog-sidebar-section">
           <h3>Нужна помощь</h3>
+          <div class="catalog-help-cards">
+            <a class="catalog-help-card" href="tel:+73412655614">
+              <span>Телефон</span>
+              <strong>+7 (3412) 65-56-14</strong>
+            </a>
+            <a class="catalog-help-card" href="mailto:gyg@comtrade-welding.ru">
+              <span>E-mail</span>
+              <strong>gyg@comtrade-welding.ru</strong>
+            </a>
+          </div>
           <div class="stack">
-            <div class="contact-line"><strong>Телефон</strong><span><a href="tel:+73412655614">+7 (3412) 65-56-14</a></span></div>
-            <div class="contact-line"><strong>E-mail</strong><span><a href="mailto:gyg@comtrade-welding.ru">gyg@comtrade-welding.ru</a></span></div>
             <a class="btn btn-primary btn-sm" href="contacts.html#request">Отправить заявку</a>
+            <a class="btn btn-secondary btn-sm" href="contacts.html#request">Отправить спецификацию</a>
           </div>
         </div>
       </aside>
