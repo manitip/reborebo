@@ -379,6 +379,7 @@ button,input,textarea,select{font:inherit}
 
 .form-dropdown-title{margin:2px 2px -2px;color:#5f7891;font-size:.82rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .form-dropdown{position:relative}
+.delivery-dropdown{position:relative}
 .form-dropdown-trigger,
 .delivery-dropdown-trigger{
   width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;
