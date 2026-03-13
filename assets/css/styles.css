@@ -149,8 +149,8 @@ button,input,textarea,select{font:inherit}
   height:2px;
   border-radius:999px;
   background:
-    linear-gradient(90deg,rgba(243,106,33,.38),rgba(14,108,201,.78),rgba(243,106,33,.98),rgba(255,152,88,.95),rgba(14,108,201,.72),rgba(243,106,33,.4)),
-    radial-gradient(circle, rgba(243,106,33,.98) 0%, rgba(243,106,33,.35) 32%, rgba(243,106,33,0) 72%);
+    linear-gradient(90deg,rgba(243,106,33,.25),rgba(14,108,201,.78),rgba(243,106,33,.64),rgba(255,152,88,.62),rgba(14,108,201,.72),rgba(243,106,33,.26)),
+    radial-gradient(circle, rgba(243,106,33,.64) 0%, rgba(243,106,33,.23) 32%, rgba(243,106,33,0) 72%);
   background-size:220% 100%,140% 300%;
   background-position:0% 50%,0% 50%;
   filter:blur(.2px);
@@ -395,11 +395,11 @@ button,input,textarea,select{font:inherit}
   content:"";width:14px;height:14px;border-radius:50%;
   margin-top:6px;flex:0 0 auto;
   background:
-    radial-gradient(circle at center, rgba(14,108,201,.82) 0%, rgba(243,106,33,.26) 58%, rgba(14,108,201,0) 100%),
-    radial-gradient(circle, rgba(243,106,33,1) 0%, rgba(243,106,33,.45) 38%, rgba(243,106,33,0) 65%);
+    radial-gradient(circle at center, rgba(14,108,201,.82) 0%, rgba(243,106,33,.17) 58%, rgba(14,108,201,0) 100%),
+    radial-gradient(circle, rgba(243,106,33,.65) 0%, rgba(243,106,33,.29) 38%, rgba(243,106,33,0) 65%);
   background-size:100% 100%,190% 190%;
   background-position:50% 50%,24% 50%;
-  box-shadow:0 0 7px rgba(243,106,33,.4);
+  box-shadow:0 0 7px rgba(243,106,33,.26);
   filter:blur(.15px);
   animation:list-dot-gradient-wander 2.8s ease-in-out infinite;
 }
