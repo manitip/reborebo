@@ -120,7 +120,10 @@ const sidebarScenarios = document.querySelector('[data-sidebar-scenarios]');
 const sidebarContextFilters = document.querySelector('[data-sidebar-context-filters]');
 const sidebarReset = document.querySelector('[data-sidebar-reset]');
 const sidebarOpenButton = document.querySelector('[data-sidebar-open]');
+const sidebarCloseButton = document.querySelector('[data-sidebar-close]');
 const sidebarBackdrop = document.querySelector('[data-sidebar-backdrop]');
+let sidebarCloseAnimationTimer = null;
+let sidebarOpenBlockedUntil = 0;
 
 const catalogSidebarConfig = {
   categories: [
@@ -443,15 +446,40 @@ const shouldAutoCloseSidebar = () => window.matchMedia('(max-width: 860px)').mat
 
 const closeCatalogSidebar = () => {
   if (!sidebarRoot) return;
+
+  if (sidebarCloseAnimationTimer) {
+    window.clearTimeout(sidebarCloseAnimationTimer);
+    sidebarCloseAnimationTimer = null;
+  }
+
   sidebarRoot.classList.remove('open');
+  sidebarRoot.classList.add('closing');
+  sidebarOpenBlockedUntil = Date.now() + 380;
+
   if (!menu || !menu.classList.contains('open')) {
     setBodyLock(false);
   }
+
   if (sidebarBackdrop) sidebarBackdrop.classList.remove('open');
+
+  sidebarCloseAnimationTimer = window.setTimeout(() => {
+    if (!sidebarRoot.classList.contains('open')) {
+      sidebarRoot.classList.remove('closing');
+    }
+    sidebarCloseAnimationTimer = null;
+  }, 320);
 };
 
 const openCatalogSidebar = () => {
   if (!sidebarRoot) return;
+  if (Date.now() < sidebarOpenBlockedUntil) return;
+
+  if (sidebarCloseAnimationTimer) {
+    window.clearTimeout(sidebarCloseAnimationTimer);
+    sidebarCloseAnimationTimer = null;
+  }
+
+  sidebarRoot.classList.remove('closing');
   sidebarRoot.classList.add('open');
   setBodyLock(true);
   if (sidebarBackdrop) sidebarBackdrop.classList.add('open');
