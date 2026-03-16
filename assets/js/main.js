@@ -124,6 +124,10 @@ const sidebarCloseButton = document.querySelector('[data-sidebar-close]');
 const sidebarBackdrop = document.querySelector('[data-sidebar-backdrop]');
 let sidebarCloseAnimationTimer = null;
 let sidebarOpenBlockedUntil = 0;
+const sidebarCloseController = {
+  forced: false,
+  timer: null
+};
 
 const catalogSidebarConfig = {
   categories: [
@@ -444,6 +448,30 @@ const applySidebarCategory = (categoryId, syncFilter = true) => {
 
 const shouldAutoCloseSidebar = () => window.matchMedia('(max-width: 860px)').matches;
 
+const activateSidebarCloseInterlock = (duration = 520) => {
+  sidebarOpenBlockedUntil = Date.now() + duration;
+  sidebarCloseController.forced = true;
+
+  if (sidebarCloseController.timer) {
+    window.clearTimeout(sidebarCloseController.timer);
+    sidebarCloseController.timer = null;
+  }
+
+  if (sidebarOpenButton) {
+    sidebarOpenButton.disabled = true;
+    sidebarOpenButton.setAttribute('aria-disabled', 'true');
+  }
+
+  sidebarCloseController.timer = window.setTimeout(() => {
+    sidebarCloseController.forced = false;
+    if (sidebarOpenButton) {
+      sidebarOpenButton.disabled = false;
+      sidebarOpenButton.removeAttribute('aria-disabled');
+    }
+    sidebarCloseController.timer = null;
+  }, duration);
+};
+
 const closeCatalogSidebar = () => {
   if (!sidebarRoot) return;
 
@@ -454,7 +482,7 @@ const closeCatalogSidebar = () => {
 
   sidebarRoot.classList.remove('open');
   sidebarRoot.classList.add('closing');
-  sidebarOpenBlockedUntil = Date.now() + 380;
+  activateSidebarCloseInterlock(520);
 
   if (!menu || !menu.classList.contains('open')) {
     setBodyLock(false);
@@ -472,13 +500,14 @@ const closeCatalogSidebar = () => {
 
 const openCatalogSidebar = () => {
   if (!sidebarRoot) return;
-  if (Date.now() < sidebarOpenBlockedUntil) return;
+  if (sidebarCloseController.forced || Date.now() < sidebarOpenBlockedUntil) return;
 
   if (sidebarCloseAnimationTimer) {
     window.clearTimeout(sidebarCloseAnimationTimer);
     sidebarCloseAnimationTimer = null;
   }
 
+  sidebarCloseController.forced = false;
   sidebarRoot.classList.remove('closing');
   sidebarRoot.classList.add('open');
   setBodyLock(true);
@@ -492,6 +521,22 @@ if (sidebarOpenButton) {
 if (sidebarCloseButton) {
   sidebarCloseButton.addEventListener('click', closeCatalogSidebar);
 }
+
+const guardSidebarOpenDuringForcedClose = (event) => {
+  if (!sidebarCloseController.forced) return;
+
+  const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+  if (!target) return;
+
+  if (!target.closest('[data-sidebar-open]')) return;
+
+  event.preventDefault();
+  event.stopPropagation();
+};
+
+document.addEventListener('click', guardSidebarOpenDuringForcedClose, true);
+document.addEventListener('pointerup', guardSidebarOpenDuringForcedClose, true);
+document.addEventListener('touchend', guardSidebarOpenDuringForcedClose, true);
 
 const handleCatalogSidebarDismiss = (event) => {
   if (!sidebarRoot || !sidebarRoot.classList.contains('open')) return;
