@@ -1143,6 +1143,49 @@ const initDeliveryDropdown = () => {
   setValue(valueField.value || 'pickup');
 };
 
+
+const initInnAndPhoneInputs = () => {
+  const innInputs = Array.from(document.querySelectorAll('[data-inn-input]'));
+  innInputs.forEach((input) => {
+    input.addEventListener('input', () => {
+      input.value = input.value.replace(/\D/g, '').slice(0, 12);
+    });
+  });
+
+  const formatPhone = (value) => {
+    const digits = value.replace(/\D/g, '');
+    let local = digits;
+    if (local.startsWith('8')) local = `7${local.slice(1)}`;
+    if (!local.startsWith('7')) local = `7${local}`;
+    local = local.slice(0, 11);
+    const tail = local.slice(1);
+
+    let formatted = '+7';
+    if (tail.length > 0) formatted += ` ${tail.slice(0, 3)}`;
+    if (tail.length > 3) formatted += ` ${tail.slice(3, 6)}`;
+    if (tail.length > 6) formatted += `-${tail.slice(6, 8)}`;
+    if (tail.length > 8) formatted += `-${tail.slice(8, 10)}`;
+
+    return formatted;
+  };
+
+  const phoneInputs = Array.from(document.querySelectorAll('[data-phone-mask]'));
+  phoneInputs.forEach((input) => {
+    input.addEventListener('focus', () => {
+      if (!input.value) input.value = '+7';
+    });
+
+    input.addEventListener('input', () => {
+      input.value = formatPhone(input.value);
+    });
+
+    input.addEventListener('blur', () => {
+      if (input.value === '+7') input.value = '';
+    });
+  });
+};
+
 initRequestBuilder();
 initFormDropdowns();
 initDeliveryDropdown();
+initInnAndPhoneInputs();
