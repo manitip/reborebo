@@ -776,6 +776,7 @@ button,input,textarea,select{font:inherit}
 .assortment-tile:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(13,40,70,.10);border-color:#bdd4ea}
 .assortment-tile:active{transform:translateY(0) scale(.99)}
 .assortment-icon{display:grid;place-items:center;color:#2b3644;flex:0 0 30px;transition:transform .24s ease,color .24s ease}
+.assortment-icon img{width:22px;height:22px;object-fit:contain;display:block}
 .assortment-tile.active{background:linear-gradient(135deg,#edf4ff,#dceafc);border-color:#b8d0ea;color:#0f2f51;box-shadow:0 12px 24px rgba(14,108,201,.12)}
 .assortment-tile.active .assortment-icon{color:#0e6cc9}
 .assortment-tile.is-pressed{animation:categoryTilePress .38s ease}
