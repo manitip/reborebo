@@ -1029,10 +1029,17 @@ button,input,textarea,select{font:inherit}
 .privacy-list li::before,.privacy-definition-list li::before{
   content:"";
   position:absolute;
-  left:14px;top:21px;
-  width:10px;height:10px;border-radius:50%;
-  background:linear-gradient(135deg,var(--accent),var(--warm));
-  box-shadow:0 0 0 4px rgba(14,108,201,.12);
+  left:12px;top:19px;
+  width:14px;height:14px;border-radius:50%;
+  background:
+    radial-gradient(circle, rgba(243,106,33,.78) 0%, rgba(243,106,33,.18) 36%, rgba(243,106,33,0) 62%),
+    radial-gradient(circle, rgba(14,108,201,.62) 0%, rgba(14,108,201,.22) 38%, rgba(14,108,201,0) 66%),
+    radial-gradient(circle at center, rgba(243,106,33,.34) 0%, rgba(14,108,201,.26) 56%, rgba(243,106,33,0) 100%);
+  background-size:185% 185%,185% 185%,100% 100%;
+  background-position:50% 50%,24% 50%,50% 50%;
+  box-shadow:0 0 7px rgba(14,108,201,.22),0 0 6px rgba(243,106,33,.18);
+  filter:blur(.15px);
+  animation:list-dot-gradient-wander 4.6s cubic-bezier(.55,.08,.4,.97) infinite alternate;
 }
 .privacy-requisites{
   margin-top:14px;
