@@ -120,7 +120,6 @@ const sidebarScenarios = document.querySelector('[data-sidebar-scenarios]');
 const sidebarContextFilters = document.querySelector('[data-sidebar-context-filters]');
 const sidebarReset = document.querySelector('[data-sidebar-reset]');
 const sidebarOpenButton = document.querySelector('[data-sidebar-open]');
-const sidebarCloseButton = document.querySelector('[data-sidebar-close]');
 const sidebarBackdrop = document.querySelector('[data-sidebar-backdrop]');
 
 const catalogSidebarConfig = {
@@ -462,25 +461,18 @@ if (sidebarOpenButton) {
   sidebarOpenButton.addEventListener('click', openCatalogSidebar);
 }
 
-if (sidebarCloseButton) {
-  sidebarCloseButton.addEventListener('click', closeCatalogSidebar);
-  sidebarCloseButton.addEventListener('touchend', (event) => {
-    event.preventDefault();
-    closeCatalogSidebar();
-  }, { passive: false });
-}
+const handleCatalogSidebarDismiss = (event) => {
+  if (!sidebarRoot || !sidebarRoot.classList.contains('open')) return;
 
-if (sidebarBackdrop) {
-  sidebarBackdrop.addEventListener('click', closeCatalogSidebar);
-}
+  const dismissTrigger = event.target.closest('[data-sidebar-close], [data-sidebar-backdrop]');
+  if (!dismissTrigger) return;
 
-if (sidebarRoot) {
-  sidebarRoot.addEventListener('click', (event) => {
-    if (event.target.closest('[data-sidebar-close]')) {
-      closeCatalogSidebar();
-    }
-  });
-}
+  event.preventDefault();
+  closeCatalogSidebar();
+};
+
+document.addEventListener('click', handleCatalogSidebarDismiss, true);
+document.addEventListener('pointerup', handleCatalogSidebarDismiss, true);
 
 const renderCatalogSidebar = () => {
   if (!sidebarRoot || !sidebarCategories || !sidebarScenarios) return;
