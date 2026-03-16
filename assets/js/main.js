@@ -120,7 +120,6 @@ const sidebarScenarios = document.querySelector('[data-sidebar-scenarios]');
 const sidebarContextFilters = document.querySelector('[data-sidebar-context-filters]');
 const sidebarReset = document.querySelector('[data-sidebar-reset]');
 const sidebarOpenButton = document.querySelector('[data-sidebar-open]');
-const sidebarCloseButton = document.querySelector('[data-sidebar-close]');
 const sidebarBackdrop = document.querySelector('[data-sidebar-backdrop]');
 
 const catalogSidebarConfig = {
@@ -458,6 +457,23 @@ const openCatalogSidebar = () => {
   if (sidebarBackdrop) sidebarBackdrop.classList.add('open');
 };
 
+if (sidebarOpenButton) {
+  sidebarOpenButton.addEventListener('click', openCatalogSidebar);
+}
+
+const handleCatalogSidebarDismiss = (event) => {
+  if (!sidebarRoot || !sidebarRoot.classList.contains('open')) return;
+
+  const dismissTrigger = event.target.closest('[data-sidebar-close], [data-sidebar-backdrop]');
+  if (!dismissTrigger) return;
+
+  event.preventDefault();
+  closeCatalogSidebar();
+};
+
+document.addEventListener('click', handleCatalogSidebarDismiss, true);
+document.addEventListener('pointerup', handleCatalogSidebarDismiss, true);
+
 const renderCatalogSidebar = () => {
   if (!sidebarRoot || !sidebarCategories || !sidebarScenarios) return;
 
@@ -500,18 +516,6 @@ const renderCatalogSidebar = () => {
   sidebarState.contextFilter = params.get('context') || '';
 
   applySidebarCategory(sidebarState.categoryId, true);
-
-  if (sidebarOpenButton) {
-    sidebarOpenButton.addEventListener('click', openCatalogSidebar);
-  }
-
-  if (sidebarCloseButton) {
-    sidebarCloseButton.addEventListener('click', closeCatalogSidebar);
-  }
-
-  if (sidebarBackdrop) {
-    sidebarBackdrop.addEventListener('click', closeCatalogSidebar);
-  }
 
   window.addEventListener('resize', () => {
     if (!window.matchMedia('(max-width: 860px)').matches) {
