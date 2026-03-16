@@ -123,6 +123,7 @@ const sidebarOpenButton = document.querySelector('[data-sidebar-open]');
 const sidebarCloseButton = document.querySelector('[data-sidebar-close]');
 const sidebarBackdrop = document.querySelector('[data-sidebar-backdrop]');
 let sidebarCloseAnimationTimer = null;
+let sidebarOpenBlockedUntil = 0;
 
 const catalogSidebarConfig = {
   categories: [
@@ -453,6 +454,7 @@ const closeCatalogSidebar = () => {
 
   sidebarRoot.classList.remove('open');
   sidebarRoot.classList.add('closing');
+  sidebarOpenBlockedUntil = Date.now() + 380;
 
   if (!menu || !menu.classList.contains('open')) {
     setBodyLock(false);
@@ -470,6 +472,7 @@ const closeCatalogSidebar = () => {
 
 const openCatalogSidebar = () => {
   if (!sidebarRoot) return;
+  if (Date.now() < sidebarOpenBlockedUntil) return;
 
   if (sidebarCloseAnimationTimer) {
     window.clearTimeout(sidebarCloseAnimationTimer);
