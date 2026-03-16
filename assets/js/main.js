@@ -458,6 +458,30 @@ const openCatalogSidebar = () => {
   if (sidebarBackdrop) sidebarBackdrop.classList.add('open');
 };
 
+if (sidebarOpenButton) {
+  sidebarOpenButton.addEventListener('click', openCatalogSidebar);
+}
+
+if (sidebarCloseButton) {
+  sidebarCloseButton.addEventListener('click', closeCatalogSidebar);
+  sidebarCloseButton.addEventListener('touchend', (event) => {
+    event.preventDefault();
+    closeCatalogSidebar();
+  }, { passive: false });
+}
+
+if (sidebarBackdrop) {
+  sidebarBackdrop.addEventListener('click', closeCatalogSidebar);
+}
+
+if (sidebarRoot) {
+  sidebarRoot.addEventListener('click', (event) => {
+    if (event.target.closest('[data-sidebar-close]')) {
+      closeCatalogSidebar();
+    }
+  });
+}
+
 const renderCatalogSidebar = () => {
   if (!sidebarRoot || !sidebarCategories || !sidebarScenarios) return;
 
@@ -500,18 +524,6 @@ const renderCatalogSidebar = () => {
   sidebarState.contextFilter = params.get('context') || '';
 
   applySidebarCategory(sidebarState.categoryId, true);
-
-  if (sidebarOpenButton) {
-    sidebarOpenButton.addEventListener('click', openCatalogSidebar);
-  }
-
-  if (sidebarCloseButton) {
-    sidebarCloseButton.addEventListener('click', closeCatalogSidebar);
-  }
-
-  if (sidebarBackdrop) {
-    sidebarBackdrop.addEventListener('click', closeCatalogSidebar);
-  }
 
   window.addEventListener('resize', () => {
     if (!window.matchMedia('(max-width: 860px)').matches) {
