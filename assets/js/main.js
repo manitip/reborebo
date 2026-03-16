@@ -461,10 +461,17 @@ if (sidebarOpenButton) {
   sidebarOpenButton.addEventListener('click', openCatalogSidebar);
 }
 
+if (sidebarCloseButton) {
+  sidebarCloseButton.addEventListener('click', closeCatalogSidebar);
+}
+
 const handleCatalogSidebarDismiss = (event) => {
   if (!sidebarRoot || !sidebarRoot.classList.contains('open')) return;
 
-  const dismissTrigger = event.target.closest('[data-sidebar-close], [data-sidebar-backdrop]');
+  const eventTarget = event.target instanceof Element ? event.target : event.target?.parentElement;
+  if (!eventTarget) return;
+
+  const dismissTrigger = eventTarget.closest('[data-sidebar-close], [data-sidebar-backdrop]');
   if (!dismissTrigger) return;
 
   event.preventDefault();
