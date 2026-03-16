@@ -120,6 +120,7 @@ const sidebarScenarios = document.querySelector('[data-sidebar-scenarios]');
 const sidebarContextFilters = document.querySelector('[data-sidebar-context-filters]');
 const sidebarReset = document.querySelector('[data-sidebar-reset]');
 const sidebarOpenButton = document.querySelector('[data-sidebar-open]');
+const sidebarCloseButton = document.querySelector('[data-sidebar-close]');
 const sidebarBackdrop = document.querySelector('[data-sidebar-backdrop]');
 
 const catalogSidebarConfig = {
