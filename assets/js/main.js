@@ -458,6 +458,30 @@ const openCatalogSidebar = () => {
   if (sidebarBackdrop) sidebarBackdrop.classList.add('open');
 };
 
+if (sidebarOpenButton) {
+  sidebarOpenButton.addEventListener('click', openCatalogSidebar);
+}
+
+if (sidebarCloseButton) {
+  sidebarCloseButton.addEventListener('click', closeCatalogSidebar);
+}
+
+const handleCatalogSidebarDismiss = (event) => {
+  if (!sidebarRoot || !sidebarRoot.classList.contains('open')) return;
+
+  const eventTarget = event.target instanceof Element ? event.target : event.target?.parentElement;
+  if (!eventTarget) return;
+
+  const dismissTrigger = eventTarget.closest('[data-sidebar-close], [data-sidebar-backdrop]');
+  if (!dismissTrigger) return;
+
+  event.preventDefault();
+  closeCatalogSidebar();
+};
+
+document.addEventListener('click', handleCatalogSidebarDismiss, true);
+document.addEventListener('pointerup', handleCatalogSidebarDismiss, true);
+
 const renderCatalogSidebar = () => {
   if (!sidebarRoot || !sidebarCategories || !sidebarScenarios) return;
 
@@ -500,18 +524,6 @@ const renderCatalogSidebar = () => {
   sidebarState.contextFilter = params.get('context') || '';
 
   applySidebarCategory(sidebarState.categoryId, true);
-
-  if (sidebarOpenButton) {
-    sidebarOpenButton.addEventListener('click', openCatalogSidebar);
-  }
-
-  if (sidebarCloseButton) {
-    sidebarCloseButton.addEventListener('click', closeCatalogSidebar);
-  }
-
-  if (sidebarBackdrop) {
-    sidebarBackdrop.addEventListener('click', closeCatalogSidebar);
-  }
 
   window.addEventListener('resize', () => {
     if (!window.matchMedia('(max-width: 860px)').matches) {

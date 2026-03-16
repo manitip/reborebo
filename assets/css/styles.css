@@ -1115,12 +1115,40 @@ button,input,textarea,select{font:inherit}
 @media (max-width:980px){
   .privacy-layout{grid-template-columns:1fr}
   .privacy-toc{position:relative;top:0}
+  .privacy-document{padding:24px}
+}
+
+@media (max-width:768px){
+  .privacy-hero-card{padding:24px}
+  .privacy-hero h1 small{font-size:.95rem;line-height:1.35}
+  .privacy-hero-note{padding:12px 14px;font-size:.95rem;line-height:1.5}
+  .privacy-toc{padding:16px}
+  .privacy-toc a{padding:10px 10px 10px 34px;font-size:.92rem;line-height:1.35}
+  .privacy-toc a::before{left:9px;width:18px;height:18px;font-size:.68rem}
+  .privacy-document{padding:20px}
+  .privacy-document>p{line-height:1.66;text-align:left;overflow-wrap:anywhere;word-break:break-word}
+  .privacy-block{scroll-margin-top:90px}
+  .privacy-list li,.privacy-definition-list li{padding:12px 12px 12px 32px;line-height:1.6}
+  .privacy-list li::before,.privacy-definition-list li::before{left:10px;top:17px;width:12px;height:12px}
+  .privacy-requisites{padding:14px}
 }
 
 @media (max-width: 576px){
   .nav-links{top:74px;left:12px;right:12px}
+  .privacy-hero-card{padding:18px}
+  .privacy-hero-note{margin-top:14px;padding:10px 12px;border-radius:12px}
+  .privacy-toc{padding:14px;border-radius:16px}
+  .privacy-document{padding:16px;border-radius:16px}
+  .privacy-block{padding-top:16px;margin-top:16px}
+  .privacy-block h2{margin-bottom:10px;line-height:1.3}
+  .privacy-requisites li{line-height:1.5;overflow-wrap:anywhere}
 }
 
 @media (max-width: 430px){
   .catalog-sidebar{width:min(94vw,330px)}
+  .privacy-hero h1{font-size:clamp(1.28rem,7.2vw,1.58rem);line-height:1.23}
+  .privacy-hero h1 small{font-size:.88rem}
+  .privacy-toc h2{font-size:1rem}
+  .privacy-toc a{padding:9px 9px 9px 32px;font-size:.9rem}
+  .privacy-document{padding:14px}
 }
