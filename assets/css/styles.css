@@ -200,9 +200,10 @@ button,input,textarea,select{font:inherit}
 }
 .logo{display:flex;align-items:center;color:var(--text)}
 .logo-image{width:320px;max-width:100%;height:auto}
+.site-header .logo-image{width:260px}
 
 @media (max-width: 720px){
-  .logo-image{width:250px}
+  .site-header .logo-image{width:220px}
 }
 .nav-links{display:flex;column-gap:4px;row-gap:4px;align-items:center;justify-content:center;flex-wrap:nowrap}
 .nav-links a{
@@ -870,7 +871,7 @@ button,input,textarea,select{font:inherit}
 @media (max-width: 430px){
   .container,.small-container{width:min(calc(100% - 24px), var(--max))}
   .hero-shell,.page-hero-shell,.compact-hero-shell,.panel,.card,.surface{padding:16px}
-  .logo-image{width:210px}
+  .site-header .logo-image{width:180px}
   .mobile-toggle{width:44px;height:44px}
   .catalog-sidebar-mobile-trigger{width:100%}
   .btn{width:100%;max-width:100%}
