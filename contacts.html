@@ -111,6 +111,27 @@
               <input type="text" name="city" placeholder="Город">
             </div>
             <p class="form-dropdown-title">Тип обращения *</p>
+            <div class="form-dropdown" data-form-dropdown>
+              <input type="hidden" name="requestType" value="quote" data-dropdown-value required>
+              <button class="form-dropdown-trigger" type="button" aria-expanded="false" data-dropdown-trigger>
+                <span class="form-dropdown-value" data-dropdown-label>Получить КП</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <div class="form-dropdown-panel" data-dropdown-panel>
+                <button type="button" class="form-dropdown-option is-active" data-dropdown-option="quote">Получить КП</button>
+                <button type="button" class="form-dropdown-option" data-dropdown-option="solution">Подобрать решение</button>
+                <button type="button" class="form-dropdown-option" data-dropdown-option="analogue">Подобрать аналог</button>
+                <button type="button" class="form-dropdown-option" data-dropdown-option="project">Инженерный проект</button>
+                <button type="button" class="form-dropdown-option" data-dropdown-option="specification">Отправить спецификацию</button>
+              </div>
+            </div>
+            <div class="grid-2">
+              <input type="text" name="companyName" placeholder="Название компании">
+              <input type="text" name="city" placeholder="Город">
+            </div>
+            <p class="form-dropdown-title">Тип обращения *</p>
             <select name="requestType" required>
               <option value="quote">Получить КП</option>
               <option value="solution">Подобрать решение</option>
