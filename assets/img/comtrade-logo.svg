@@ -1,0 +1,9 @@
+<svg width="638" height="166" viewBox="0 0 638 166" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="logoTitle logoDesc">
+  <title id="logoTitle">Логотип Комтрейд</title>
+  <desc id="logoDesc">Надпись КОМТРЕЙД и подзаголовок сварочные материалы и оборудование</desc>
+  <rect width="638" height="166" fill="white"/>
+  <path d="M506 38L531 0H560L535 38H506Z" fill="#F36A21"/>
+  <path d="M506 38H535V118H506V38Z" fill="#4A4A4D"/>
+  <text x="0" y="103" fill="#4A4A4D" font-family="Inter, Arial, sans-serif" font-size="104" font-weight="800" letter-spacing="1.2">КОМТРЕЙД</text>
+  <text x="0" y="159" fill="#4A4A4D" font-family="Inter, Arial, sans-serif" font-size="42" font-weight="600" letter-spacing="2">сварочные материалы и оборудование</text>
+</svg>
