@@ -99,12 +99,12 @@
           <h2 style="margin:14px 0 12px;font-size:2rem;line-height:1.08">Коммерческое предложение под вашу задачу</h2>
           <form class="form-grid" data-request-form data-endpoint="https://httpbin.org/post">
             <div class="grid-2">
-              <input type="text" name="inn" placeholder="Укажите ИНН компании" inputmode="numeric" pattern="\d*" maxlength="12" data-inn-input>
+              <input type="text" name="inn" placeholder="Укажите ИНН компании" inputmode="numeric" pattern="\d*" maxlength="12" data-inn-input required>
               <input type="text" name="contactPerson" placeholder="Контактное лицо *" required>
             </div>
             <div class="grid-2">
-              <input type="tel" name="phone" placeholder="+7 999 999-99-99" inputmode="tel" pattern="\+7\s\d{3}\s\d{3}-\d{2}-\d{2}" maxlength="16" data-phone-mask>
-              <input type="email" name="email" placeholder="E-mail">
+              <input type="tel" name="phone" placeholder="+7 999 999-99-99" inputmode="tel" pattern="\+7\s\d{3}\s\d{3}-\d{2}-\d{2}" maxlength="16" data-phone-mask required>
+              <input type="email" name="email" placeholder="E-mail" required>
             </div>
             <div class="grid-2">
               <input type="text" name="companyName" placeholder="Название компании">
