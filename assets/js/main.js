@@ -1448,6 +1448,57 @@ const initRequestWidget = () => {
   document.addEventListener('request:updated', refresh);
 };
 
+
+const initSimpleLeadForms = () => {
+  const forms = Array.from(document.querySelectorAll('[data-simple-lead-form]'));
+  if (!forms.length) return;
+
+  forms.forEach((form) => {
+    form.noValidate = true;
+    const status = form.querySelector('[data-simple-form-status]');
+    const submitButton = form.querySelector('[type="submit"]');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const name = (form.querySelector('[name="name"]')?.value || '').trim();
+      const phone = (form.querySelector('[name="phone"]')?.value || '').trim();
+      const email = (form.querySelector('[name="email"]')?.value || '').trim();
+      const comment = (form.querySelector('[name="comment"]')?.value || '').trim();
+
+      if (!name || !phone || !email || !comment) {
+        if (status) {
+          status.textContent = 'Заполните обязательные поля.';
+          status.classList.add('is-error');
+        }
+        return;
+      }
+
+      const formData = new FormData(form);
+      formData.append('contactPerson', name);
+      formData.append('companyName', form.querySelector('[name="company"]')?.value || '');
+      formData.append('sourcePage', window.location.pathname);
+      formData.append('utm', JSON.stringify(Object.fromEntries(new URLSearchParams(window.location.search))));
+      formData.append('referrer', document.referrer || '');
+      formData.append('submittedAt', new Date().toISOString());
+
+      if (submitButton) submitButton.disabled = true;
+      try {
+        const response = await fetch(form.dataset.endpoint || '/api/leads', { method: 'POST', body: formData });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error((payload.details || []).join(' · ') || payload.error || 'Ошибка отправки');
+        window.location.href = 'success.html';
+      } catch (error) {
+        if (status) {
+          status.textContent = error?.message || 'Не удалось отправить форму.';
+          status.classList.add('is-error');
+        }
+      } finally {
+        if (submitButton) submitButton.disabled = false;
+      }
+    });
+  });
+};
+
 const initLeadForm = () => {
   const form = document.querySelector('[data-request-form]');
   if (!form) return;
@@ -1624,12 +1675,15 @@ const initLeadForm = () => {
     formData.append('requestItems', JSON.stringify(getRequestItems()));
     formData.append('sourcePage', params.get('source') || window.location.pathname);
     formData.append('utm', JSON.stringify(Object.fromEntries(new URLSearchParams(window.location.search))));
+    formData.append('referrer', document.referrer || '');
+    formData.append('submittedAt', new Date().toISOString());
     attachedFiles.forEach((file) => formData.append('files', file));
 
-    const endpoint = form.dataset.endpoint || 'https://httpbin.org/post';
+    const endpoint = form.dataset.endpoint || '/api/leads';
     try {
       const response = await fetch(endpoint, { method: 'POST', body: formData });
-      if (!response.ok) throw new Error('Submit failed');
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error((payload.details || []).join(' · ') || payload.error || 'Submit failed');
       if (status) status.textContent = 'Спасибо! Заявка отправлена. Мы свяжемся с вами в ближайшее время.';
       form.reset();
       attachedFiles = [];
@@ -1637,8 +1691,9 @@ const initLeadForm = () => {
       setRequestItems([]);
       document.dispatchEvent(new CustomEvent('request:updated'));
       trackEvent('lead_form_submit_success', { scenario: scenarioField?.value || '' });
+      window.location.href = 'success.html';
     } catch (error) {
-      if (status) status.textContent = 'Не удалось отправить заявку. Попробуйте ещё раз или свяжитесь с нами по телефону.';
+      if (status) status.textContent = error?.message || 'Не удалось отправить заявку. Попробуйте ещё раз или свяжитесь с нами по телефону.';
       status?.classList.add('is-error');
       trackEvent('lead_form_submit_error', { reason: 'network' });
     } finally {
@@ -1654,3 +1709,4 @@ initInnAndPhoneInputs();
 initUnifiedCta();
 initRequestWidget();
 initLeadForm();
+initSimpleLeadForms();

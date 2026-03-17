@@ -97,7 +97,8 @@
         <article class="card contact-card reveal" id="request">
           <span class="eyebrow">Отправить запрос</span>
           <h2 style="margin:14px 0 12px;font-size:2rem;line-height:1.08">Коммерческое предложение под вашу задачу</h2>
-          <form class="form-grid" data-request-form data-endpoint="https://httpbin.org/post">
+          <form class="form-grid" data-request-form data-endpoint="/api/leads">
+            <input type="text" name="website" tabindex="-1" autocomplete="off" class="visually-hidden" aria-hidden="true">
             <div class="grid-2">
               <div class="field-wrap">
                 <input type="text" name="inn" placeholder="Укажите ИНН компании" inputmode="numeric" pattern="\d*" maxlength="12" data-inn-input required>
@@ -133,6 +134,7 @@
                 <button type="button" class="form-dropdown-option" data-dropdown-option="analogue">Подобрать аналог</button>
                 <button type="button" class="form-dropdown-option" data-dropdown-option="project">Инженерный проект</button>
                 <button type="button" class="form-dropdown-option" data-dropdown-option="specification">Отправить спецификацию</button>
+                <button type="button" class="form-dropdown-option" data-dropdown-option="general">Общий запрос</button>
               </div>
             </div>
             <p class="form-dropdown-title">Интересующее направление</p>
