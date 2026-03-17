@@ -1451,6 +1451,7 @@ const initRequestWidget = () => {
 const initLeadForm = () => {
   const form = document.querySelector('[data-request-form]');
   if (!form) return;
+  form.noValidate = true;
 
   const scenarioField = form.querySelector('[name="requestType"]');
   const scenarioBlocks = Array.from(form.querySelectorAll('[data-scenario-block]'));
@@ -1473,15 +1474,34 @@ const initLeadForm = () => {
   const clearFieldError = (field) => {
     if (!field) return;
     field.classList.remove(invalidClass);
-    const container = field.closest('.field-wrap, .consent-row') || field.parentElement;
+
+    if (field.type === 'checkbox') {
+      const container = field.closest('.consent-row');
+      const message = container?.querySelector(`.${invalidLabelClass}`);
+      if (message) message.remove();
+      return;
+    }
+
+    const container = field.closest('.field-wrap') || field.parentElement;
     const message = container?.querySelector(`.${invalidLabelClass}`);
     if (message) message.remove();
   };
 
   const showFieldError = (field) => {
     if (!field) return;
-    const container = field.closest('.field-wrap, .consent-row') || field.parentElement;
     field.classList.add(invalidClass);
+
+    if (field.type === 'checkbox') {
+      const container = field.closest('.consent-row');
+      if (!container || container.querySelector(`.${invalidLabelClass}`)) return;
+      const message = document.createElement('div');
+      message.className = invalidLabelClass;
+      message.textContent = requiredMessageText;
+      container.append(message);
+      return;
+    }
+
+    const container = field.closest('.field-wrap') || field.parentElement;
     if (!container || container.querySelector(`.${invalidLabelClass}`)) return;
     const message = document.createElement('div');
     message.className = invalidLabelClass;

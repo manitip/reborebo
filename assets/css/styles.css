@@ -562,6 +562,7 @@ button,input,textarea,select{font:inherit}
 }
 .form-grid textarea{min-height:140px;resize:vertical}
 
+.form-grid .field-wrap{display:flex;flex-direction:column}
 .form-grid .is-invalid-field{
   border-color:#d73535 !important;
   box-shadow:0 0 0 1px rgba(215,53,53,.2);
