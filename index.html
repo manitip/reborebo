@@ -369,21 +369,23 @@
       </article>
       <article class="card contact-card reveal" id="request">
         <span class="eyebrow">Запросить КП</span>
-        <form class="form-grid">
-          <input type="text" placeholder="Укажите ИНН компании" inputmode="numeric" pattern="\d*" maxlength="12" data-inn-input>
-          <input type="text" placeholder="Контактное лицо">
-          <input type="tel" placeholder="+7 999 999-99-99" inputmode="tel" pattern="\+7\s\d{3}\s\d{3}-\d{2}-\d{2}" maxlength="16" data-phone-mask>
-          <input type="email" placeholder="E-mail">
-          <select>
-            <option>Выберите направление</option>
-            <option>Сварочные материалы</option>
-            <option>Сварочное оборудование</option>
-            <option>Техническая химия</option>
-            <option>Инжиниринговое решение</option>
+        <form class="form-grid" data-simple-lead-form data-endpoint="/api/leads">
+          <input type="text" name="website" tabindex="-1" autocomplete="off" class="visually-hidden" aria-hidden="true">
+          <input type="text" name="company" placeholder="Компания" inputmode="text">
+          <input type="text" name="name" placeholder="Контактное лицо" required>
+          <input type="tel" name="phone" placeholder="+7 999 999-99-99" inputmode="tel" pattern="\+7\s\d{3}\s\d{3}-\d{2}-\d{2}" maxlength="16" data-phone-mask required>
+          <input type="email" name="email" placeholder="E-mail" required>
+          <select name="requestType">
+            <option value="quote">Запрос КП</option>
+            <option value="analogue">Подбор аналога</option>
+            <option value="solution">Подбор решения</option>
+            <option value="project">Инженерный проект</option>
+            <option value="general">Общий запрос</option>
           </select>
-          <textarea placeholder="Перечень позиций, объёмы, требования к оборудованию или описание проекта"></textarea>
-          <button class="btn btn-primary" type="button">Отправить запрос</button>
+          <textarea name="comment" placeholder="Перечень позиций, объёмы, требования к оборудованию или описание проекта" required></textarea>
+          <button class="btn btn-primary" type="submit">Отправить запрос</button>
           <div class="form-note">Нажимая кнопку, вы подтверждаете согласие на обработку персональных данных и получение ответа по указанным контактам.</div>
+          <div class="form-status" data-simple-form-status aria-live="polite"></div>
         </form>
       </article>
     </div>
