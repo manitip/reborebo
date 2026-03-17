@@ -97,14 +97,35 @@
         <article class="card contact-card reveal" id="request">
           <span class="eyebrow">Отправить запрос</span>
           <h2 style="margin:14px 0 12px;font-size:2rem;line-height:1.08">Коммерческое предложение под вашу задачу</h2>
-          <form class="form-grid" data-request-form>
+          <form class="form-grid" data-request-form data-endpoint="https://httpbin.org/post">
             <div class="grid-2">
-              <input type="text" placeholder="Укажите ИНН компании" inputmode="numeric" pattern="\d*" maxlength="12" data-inn-input>
-              <input type="text" placeholder="Контактное лицо">
+              <input type="text" name="inn" placeholder="Укажите ИНН компании" inputmode="numeric" pattern="\d*" maxlength="12" data-inn-input>
+              <input type="text" name="contactPerson" placeholder="Контактное лицо *" required>
             </div>
             <div class="grid-2">
-              <input type="tel" placeholder="+7 999 999-99-99" inputmode="tel" pattern="\+7\s\d{3}\s\d{3}-\d{2}-\d{2}" maxlength="16" data-phone-mask>
-              <input type="email" placeholder="E-mail">
+              <input type="tel" name="phone" placeholder="+7 999 999-99-99" inputmode="tel" pattern="\+7\s\d{3}\s\d{3}-\d{2}-\d{2}" maxlength="16" data-phone-mask>
+              <input type="email" name="email" placeholder="E-mail">
+            </div>
+            <div class="grid-2">
+              <input type="text" name="companyName" placeholder="Название компании">
+              <input type="text" name="city" placeholder="Город">
+            </div>
+            <p class="form-dropdown-title">Тип обращения *</p>
+            <div class="form-dropdown" data-form-dropdown>
+              <input type="hidden" name="requestType" value="quote" data-dropdown-value required>
+              <button class="form-dropdown-trigger" type="button" aria-expanded="false" data-dropdown-trigger>
+                <span class="form-dropdown-value" data-dropdown-label>Получить КП</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <div class="form-dropdown-panel" data-dropdown-panel>
+                <button type="button" class="form-dropdown-option is-active" data-dropdown-option="quote">Получить КП</button>
+                <button type="button" class="form-dropdown-option" data-dropdown-option="solution">Подобрать решение</button>
+                <button type="button" class="form-dropdown-option" data-dropdown-option="analogue">Подобрать аналог</button>
+                <button type="button" class="form-dropdown-option" data-dropdown-option="project">Инженерный проект</button>
+                <button type="button" class="form-dropdown-option" data-dropdown-option="specification">Отправить спецификацию</button>
+              </div>
             </div>
             <p class="form-dropdown-title">Интересующее направление</p>
 
@@ -151,10 +172,60 @@
               <p class="request-empty" data-request-empty>Пока нет добавленных товаров. Добавьте их из карточек каталога или вручную.</p>
             </div>
 
-            <textarea data-request-message placeholder="Опишите задачу: перечень позиций, металл, способ сварки, объёмы, требуемые сроки или параметры проекта"></textarea>
-            <textarea data-request-summary hidden></textarea>
-            <button class="btn btn-primary" type="button">Отправить запрос</button>
-            <div class="form-note">Можно приложить к письму спецификацию или ведомость позиций и направить её на e-mail отдела продаж.</div>
+            <div class="scenario-panel" data-scenario-block="quote">
+              <div class="grid-2">
+                <input type="text" name="quotePositions" placeholder="Перечень позиций">
+                <input type="text" name="quoteQty" placeholder="Количество">
+              </div>
+              <div class="grid-2">
+                <input type="text" name="quoteDeliveryDate" placeholder="Желаемый срок поставки">
+                <input type="text" name="quoteDeliveryType" placeholder="Способ доставки">
+              </div>
+            </div>
+
+            <div class="scenario-panel" data-scenario-block="solution" hidden>
+              <div class="grid-2">
+                <input type="text" name="solutionType" placeholder="Тип продукции">
+                <input type="text" name="solutionMetal" placeholder="Металл">
+              </div>
+              <div class="grid-2">
+                <input type="text" name="solutionThickness" placeholder="Толщина металла">
+                <input type="text" name="solutionWeldingType" placeholder="Способ сварки">
+              </div>
+            </div>
+
+            <div class="scenario-panel" data-scenario-block="analogue" hidden>
+              <div class="grid-2">
+                <input type="text" name="analogueCurrent" placeholder="Текущая марка / модель">
+                <input type="text" name="analogueTarget" placeholder="Требуемый аналог">
+              </div>
+            </div>
+
+            <div class="scenario-panel" data-scenario-block="project" hidden>
+              <div class="grid-2">
+                <input type="text" name="projectType" placeholder="Тип производства">
+                <input type="text" name="projectResult" placeholder="Требуемый результат">
+              </div>
+              <textarea name="projectIssue" placeholder="Текущая проблема"></textarea>
+            </div>
+
+            <div class="scenario-panel" data-scenario-block="specification" hidden>
+              <p class="form-note">Загрузите спецификацию, чертеж, фото узла или ТЗ.</p>
+            </div>
+
+            <div class="file-uploader">
+              <label class="btn btn-secondary btn-sm" for="requestFiles">Прикрепить файлы</label>
+              <input id="requestFiles" data-file-input type="file" multiple accept=".pdf,.xls,.xlsx,.doc,.docx,.jpg,.jpeg,.png,.zip" hidden>
+              <div class="file-hint" data-file-hint>Файлов: 0/10 · 0 МБ из 50 МБ</div>
+              <div class="file-list" data-file-list></div>
+            </div>
+
+            <textarea name="comment" data-request-message placeholder="Опишите задачу: перечень позиций, металл, способ сварки, объёмы, требуемые сроки или параметры проекта"></textarea>
+            <textarea name="requestSummary" data-request-summary hidden></textarea>
+            <label class="consent-row"><input type="checkbox" name="consent" required> Согласен на обработку персональных данных</label>
+            <button class="btn btn-primary" type="submit">Отправить запрос</button>
+            <div class="form-note">Можно приложить до 10 файлов (PDF/XLS/DOC/JPG/PNG/ZIP), общий размер до 50 МБ.</div>
+            <div class="form-status" data-form-status aria-live="polite"></div>
           </form>
         </article>
 
