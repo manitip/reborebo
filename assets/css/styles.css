@@ -1197,6 +1197,7 @@ button,input,textarea,select{font:inherit}
   border-radius:14px;
   background:var(--surface-2);
 }
+.scenario-panel[hidden]{display:none}
 .file-uploader{
   display:grid;
   gap:8px;
