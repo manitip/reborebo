@@ -1173,9 +1173,15 @@ const initFormDropdowns = () => {
     const syncValue = (value) => {
       const selectedOption = options.find((option) => option.dataset.dropdownOption === value) || options[0];
       const nextValue = selectedOption.dataset.dropdownOption || '';
+      const previousValue = valueField.value;
       valueField.value = nextValue;
       label.textContent = selectedOption.textContent;
       options.forEach((option) => option.classList.toggle('is-active', option === selectedOption));
+
+      if (previousValue !== nextValue) {
+        valueField.dispatchEvent(new Event('input', { bubbles: true }));
+        valueField.dispatchEvent(new Event('change', { bubbles: true }));
+      }
     };
 
     const closeDropdown = () => {
