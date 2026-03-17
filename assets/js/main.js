@@ -844,6 +844,7 @@ const getRequestItems = () => {
 
 const setRequestItems = (items) => {
   localStorage.setItem(requestStorageKey, JSON.stringify(items));
+  document.dispatchEvent(new CustomEvent('request:updated'));
 };
 
 const getRequestQty = (name = '') => {
@@ -864,13 +865,19 @@ const upsertRequestItem = (name, qty) => {
       items.splice(index, 1);
     }
     setRequestItems(items);
+    trackEvent('request_remove_item', { item_name: normalizedName });
     return;
   }
 
   if (index >= 0) {
+    const previousQty = Math.max(0, Number(items[index].qty) || 0);
     items[index].qty = normalizedQty;
+    if (previousQty !== normalizedQty) {
+      trackEvent('request_change_qty', { item_name: normalizedName, qty: normalizedQty });
+    }
   } else {
     items.push({ name: normalizedName, qty: normalizedQty });
+    trackEvent('request_add_item', { item_name: normalizedName, qty: normalizedQty });
   }
 
   setRequestItems(items);
@@ -1082,6 +1089,7 @@ const initRequestBuilder = () => {
     button.addEventListener('click', () => {
       const currentQty = getRequestQty(button.dataset.productName);
       if (currentQty > 0) {
+        trackEvent('request_open', { from: 'product_card' });
         window.location.href = 'contacts.html#request';
         return;
       }
@@ -1335,7 +1343,231 @@ const initInnAndPhoneInputs = () => {
   });
 };
 
+const trackEvent = (eventName, params = {}) => {
+  const payload = {
+    event: eventName,
+    page_url: window.location.href,
+    page_type: document.body.dataset.pageType || document.documentElement.dataset.pageType || 'generic',
+    device_type: window.matchMedia('(max-width: 860px)').matches ? 'mobile' : 'desktop',
+    referrer: document.referrer || '',
+    ...params
+  };
+
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push(payload);
+  if (typeof window.ym === 'function') {
+    window.ym(window.YM_COUNTER_ID || 0, 'reachGoal', eventName, payload);
+  }
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', eventName, payload);
+  }
+};
+
+const initUnifiedCta = () => {
+  const isFileProtocol = window.location.protocol === 'file:';
+  const pageSource = isFileProtocol
+    ? (window.location.pathname.split('/').pop() || 'index.html')
+    : window.location.pathname;
+
+  const buildScenarioHref = (rawHref, scenario) => {
+    const fallback = `contacts.html?scenario=${encodeURIComponent(scenario)}&source=${encodeURIComponent(pageSource)}#request`;
+    if (!rawHref) return fallback;
+
+    try {
+      const resolved = new URL(rawHref, window.location.href);
+      const targetPath = resolved.protocol === 'file:'
+        ? (resolved.pathname.split('/').pop() || 'contacts.html')
+        : (resolved.pathname || 'contacts.html');
+
+      resolved.searchParams.set('scenario', scenario);
+      resolved.searchParams.set('source', pageSource);
+
+      return `${targetPath}${resolved.search}${resolved.hash || '#request'}`;
+    } catch {
+      return fallback;
+    }
+  };
+
+  const inferScenario = (text = '') => {
+    const normalized = text.toLowerCase();
+    if (normalized.includes('кп') || normalized.includes('цен')) return 'quote';
+    if (normalized.includes('специф')) return 'specification';
+    return 'solution';
+  };
+
+  document.querySelectorAll('a[href*="contacts.html"], button[data-open-request]').forEach((cta) => {
+    const scenario = cta.dataset.scenarioCta || inferScenario(cta.textContent || '');
+    cta.dataset.scenarioCta = scenario;
+    if (cta.tagName === 'A') {
+      cta.setAttribute('href', buildScenarioHref(cta.getAttribute('href'), scenario));
+    }
+  });
+
+  const scenarios = [
+    { key: 'quote', label: 'Получить КП' },
+    { key: 'solution', label: 'Подобрать решение' },
+    { key: 'specification', label: 'Отправить спецификацию' }
+  ];
+
+  const bar = document.createElement('div');
+  bar.className = 'mobile-cta-bar';
+  bar.innerHTML = scenarios.map((item) => `<a class="btn btn-primary btn-sm" href="contacts.html?scenario=${encodeURIComponent(item.key)}&source=${encodeURIComponent(pageSource)}#request" data-scenario-cta="${item.key}">${item.label}</a>`).join('');
+  document.body.append(bar);
+
+  document.querySelectorAll('[data-scenario-cta]').forEach((link) => {
+    link.addEventListener('click', () => {
+      trackEvent(`click_cta_${link.dataset.scenarioCta}`, { source_page: pageSource });
+    });
+  });
+};
+
+const initRequestWidget = () => {
+  const widget = document.createElement('a');
+  widget.className = 'request-widget';
+  widget.href = 'contacts.html#request';
+  widget.innerHTML = '<span class="request-widget__title">Ваш запрос</span><span class="request-widget__meta" data-request-widget-meta>0 позиций · 0 шт.</span>';
+  document.body.append(widget);
+
+  const refresh = () => {
+    const items = getRequestItems();
+    const positions = items.length;
+    const units = items.reduce((acc, item) => acc + (Number(item.qty) || 0), 0);
+    const meta = widget.querySelector('[data-request-widget-meta]');
+    if (meta) meta.textContent = `${positions} позиций · ${units} шт.`;
+    widget.classList.toggle('is-empty', positions === 0);
+  };
+
+  refresh();
+  window.addEventListener('storage', refresh);
+  document.addEventListener('request:updated', refresh);
+};
+
+const initLeadForm = () => {
+  const form = document.querySelector('[data-request-form]');
+  if (!form) return;
+
+  const scenarioField = form.querySelector('[name="requestType"]');
+  const scenarioBlocks = Array.from(form.querySelectorAll('[data-scenario-block]'));
+  const fileInput = form.querySelector('[data-file-input]');
+  const fileList = form.querySelector('[data-file-list]');
+  const fileHint = form.querySelector('[data-file-hint]');
+  const submitButton = form.querySelector('[type="submit"]');
+  const status = form.querySelector('[data-form-status]');
+  const commentField = form.querySelector('[data-request-message]');
+  const consentField = form.querySelector('[name="consent"]');
+  const contactField = form.querySelector('[name="contactPerson"]');
+  const phoneField = form.querySelector('[name="phone"]');
+  const emailField = form.querySelector('[name="email"]');
+
+  const allowedFileTypes = ['pdf', 'xls', 'xlsx', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'zip'];
+  let attachedFiles = [];
+  const maxFiles = 10;
+  const maxBytes = 50 * 1024 * 1024;
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('scenario') && scenarioField) scenarioField.value = params.get('scenario');
+
+  const refreshScenario = () => {
+    const active = scenarioField ? scenarioField.value : '';
+    scenarioBlocks.forEach((block) => block.hidden = block.dataset.scenarioBlock !== active);
+  };
+
+  const refreshFileList = () => {
+    if (!fileList) return;
+    fileList.innerHTML = '';
+    attachedFiles.forEach((file, index) => {
+      const row = document.createElement('div');
+      row.className = 'file-row';
+      row.innerHTML = `<span>${file.name} (${Math.round(file.size / 1024)} КБ)</span><button type="button" data-remove-file="${index}">Удалить</button>`;
+      fileList.append(row);
+    });
+    if (fileHint) {
+      const total = attachedFiles.reduce((acc, file) => acc + file.size, 0);
+      fileHint.textContent = `Файлов: ${attachedFiles.length}/10 · ${Math.round(total / 1024 / 1024 * 10) / 10} МБ из 50 МБ`;
+    }
+  };
+
+  fileInput?.addEventListener('change', () => {
+    const candidates = Array.from(fileInput.files || []);
+    candidates.forEach((file) => {
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+      const totalBytes = attachedFiles.reduce((acc, item) => acc + item.size, 0) + file.size;
+      if (!allowedFileTypes.includes(ext) || attachedFiles.length >= maxFiles || totalBytes > maxBytes) return;
+      attachedFiles.push(file);
+      trackEvent('lead_file_upload', { file_name: file.name, file_size: file.size });
+    });
+    fileInput.value = '';
+    refreshFileList();
+  });
+
+  fileList?.addEventListener('click', (event) => {
+    const removeButton = event.target.closest('[data-remove-file]');
+    if (!removeButton) return;
+    const index = Number(removeButton.dataset.removeFile);
+    attachedFiles.splice(index, 1);
+    refreshFileList();
+  });
+
+  scenarioField?.addEventListener('change', refreshScenario);
+  refreshScenario();
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    trackEvent('lead_form_start', { scenario: scenarioField?.value || '' });
+
+    const errors = [];
+    const phoneDigits = (phoneField?.value || '').replace(/\D/g, '');
+    const emailValue = (emailField?.value || '').trim();
+    if (!contactField?.value.trim()) errors.push('Укажите контактное лицо');
+    if (!scenarioField?.value) errors.push('Выберите тип обращения');
+    if (!phoneDigits && !emailValue) errors.push('Нужен телефон или email');
+    if (phoneDigits && phoneDigits.length < 11) errors.push('Проверьте номер телефона');
+    if (emailValue && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) errors.push('Проверьте email');
+    if ((!commentField?.value || commentField.value.trim().length < 10) && getRequestItems().length === 0) errors.push('Добавьте описание задачи или позиции');
+    if (!consentField?.checked) errors.push('Нужно согласие на обработку данных');
+
+    if (errors.length) {
+      if (status) status.textContent = errors.join(' · ');
+      status?.classList.add('is-error');
+      trackEvent('lead_form_submit_error', { errors: errors.join(', ') });
+      return;
+    }
+
+    if (submitButton) submitButton.disabled = true;
+    status?.classList.remove('is-error');
+    if (status) status.textContent = 'Отправляем заявку…';
+
+    const formData = new FormData(form);
+    formData.append('requestItems', JSON.stringify(getRequestItems()));
+    formData.append('sourcePage', params.get('source') || window.location.pathname);
+    formData.append('utm', JSON.stringify(Object.fromEntries(new URLSearchParams(window.location.search))));
+    attachedFiles.forEach((file) => formData.append('files', file));
+
+    const endpoint = form.dataset.endpoint || 'https://httpbin.org/post';
+    try {
+      const response = await fetch(endpoint, { method: 'POST', body: formData });
+      if (!response.ok) throw new Error('Submit failed');
+      if (status) status.textContent = 'Спасибо! Заявка отправлена. Мы свяжемся с вами в ближайшее время.';
+      form.reset();
+      attachedFiles = [];
+      refreshFileList();
+      setRequestItems([]);
+      document.dispatchEvent(new CustomEvent('request:updated'));
+      trackEvent('lead_form_submit_success', { scenario: scenarioField?.value || '' });
+    } catch (error) {
+      if (status) status.textContent = 'Не удалось отправить заявку. Попробуйте ещё раз или свяжитесь с нами по телефону.';
+      status?.classList.add('is-error');
+      trackEvent('lead_form_submit_error', { reason: 'network' });
+    } finally {
+      if (submitButton) submitButton.disabled = false;
+    }
+  });
+};
+
 initRequestBuilder();
 initFormDropdowns();
 initDeliveryDropdown();
 initInnAndPhoneInputs();
+initUnifiedCta();
+initRequestWidget();
+initLeadForm();
