@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import cgi
 import json
 import os
 import re
@@ -24,6 +23,68 @@ MAX_FILE_SIZE = 50 * 1024 * 1024
 ALLOWED_TYPES = {"pdf", "xls", "xlsx", "doc", "docx", "jpg", "jpeg", "png", "zip"}
 ALLOWED_REQUEST_TYPES = {"quote", "analogue", "solution", "project", "general", "specification"}
 ALLOWED_STATUSES = {"new", "in_progress", "waiting_clarification", "quote_sent", "completed", "cancelled"}
+
+class UploadedFile:
+    def __init__(self, filename: str, content: bytes):
+        self.filename = filename
+        self.content = content
+
+
+def _parse_disposition(value: str):
+    parts = [part.strip() for part in value.split(';') if part.strip()]
+    meta = {}
+    for part in parts[1:]:
+        if '=' not in part:
+            continue
+        k, v = part.split('=', 1)
+        meta[k.strip().lower()] = v.strip().strip('"')
+    return meta
+
+
+def _parse_multipart(raw: bytes, content_type: str):
+    boundary_match = re.search(r'boundary=([^;]+)', content_type)
+    if not boundary_match:
+        raise ValueError('boundary not found for multipart/form-data')
+
+    boundary = boundary_match.group(1).strip().strip('"').encode('utf-8')
+    delimiter = b'--' + boundary
+    data = {}
+    files = []
+
+    parts = raw.split(delimiter)
+    for part in parts[1:]:
+        part = part.strip()
+        if not part or part == b'--':
+            continue
+
+        if b'\r\n\r\n' in part:
+            header_blob, body = part.split(b'\r\n\r\n', 1)
+        elif b'\n\n' in part:
+            header_blob, body = part.split(b'\n\n', 1)
+        else:
+            continue
+
+        body = body.rstrip(b'\r\n')
+        headers = {}
+        for line in header_blob.decode('utf-8', errors='replace').splitlines():
+            if ':' not in line:
+                continue
+            key, value = line.split(':', 1)
+            headers[key.strip().lower()] = value.strip()
+
+        disp = headers.get('content-disposition', '')
+        meta = _parse_disposition(disp)
+        field_name = meta.get('name')
+        if not field_name:
+            continue
+
+        filename = meta.get('filename')
+        if filename:
+            files.append(UploadedFile(filename=filename, content=body))
+        else:
+            data[field_name] = body.decode('utf-8', errors='replace')
+
+    return data, files
 
 
 def db():
@@ -77,27 +138,13 @@ def clean_phone(value: str):
 
 def parse_payload(handler: BaseHTTPRequestHandler):
     ctype = handler.headers.get("Content-Type", "")
-    if ctype.startswith("multipart/form-data"):
-        form = cgi.FieldStorage(
-            fp=handler.rfile,
-            headers=handler.headers,
-            environ={"REQUEST_METHOD": "POST", "CONTENT_TYPE": ctype},
-        )
-        data = {}
-        files = []
-        for key in form.keys():
-            item = form[key]
-            items = item if isinstance(item, list) else [item]
-            for current in items:
-                if current.filename:
-                    files.append(current)
-                else:
-                    data[key] = current.value
-        return data, files
-
     raw = handler.rfile.read(int(handler.headers.get("Content-Length", "0") or "0"))
+
+    if ctype.startswith("multipart/form-data"):
+        return _parse_multipart(raw, ctype)
     if ctype.startswith("application/json"):
         return json.loads(raw.decode("utf-8") or "{}"), []
+
     parsed = urllib.parse.parse_qs(raw.decode("utf-8"), keep_blank_values=True)
     return {k: v[-1] for k, v in parsed.items()}, []
 
@@ -107,7 +154,7 @@ def save_files(file_fields):
     for field in file_fields:
         name = os.path.basename(field.filename)
         ext = (name.split(".")[-1] if "." in name else "").lower()
-        content = field.file.read()
+        content = field.content
         if ext not in ALLOWED_TYPES:
             raise ValueError(f"Недопустимый тип файла: {name}")
         if len(content) > MAX_FILE_SIZE:
@@ -331,7 +378,10 @@ class Handler(BaseHTTPRequestHandler):
         if not check_rate_limit(ip):
             return self._json(429, {"error": "Слишком много запросов. Повторите позже."})
 
-        data, file_fields = parse_payload(self)
+        try:
+            data, file_fields = parse_payload(self)
+        except (ValueError, json.JSONDecodeError) as exc:
+            return self._json(400, {"error": f"Некорректный формат запроса: {exc}"})
 
         if data.get("website"):
             return self._json(200, {"ok": True})
