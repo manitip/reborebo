@@ -1451,6 +1451,7 @@ const initRequestWidget = () => {
 const initLeadForm = () => {
   const form = document.querySelector('[data-request-form]');
   if (!form) return;
+  form.noValidate = true;
 
   const scenarioField = form.querySelector('[name="requestType"]');
   const scenarioBlocks = Array.from(form.querySelectorAll('[data-scenario-block]'));
@@ -1462,8 +1463,59 @@ const initLeadForm = () => {
   const commentField = form.querySelector('[data-request-message]');
   const consentField = form.querySelector('[name="consent"]');
   const contactField = form.querySelector('[name="contactPerson"]');
+  const innField = form.querySelector('[name="inn"]');
   const phoneField = form.querySelector('[name="phone"]');
   const emailField = form.querySelector('[name="email"]');
+
+  const invalidClass = 'is-invalid-field';
+  const invalidLabelClass = 'field-required-message';
+  const requiredMessageText = 'Заполните обязательное поле';
+
+  const clearFieldError = (field) => {
+    if (!field) return;
+    field.classList.remove(invalidClass);
+
+    if (field.type === 'checkbox') {
+      const container = field.closest('.consent-row');
+      const message = container?.querySelector(`.${invalidLabelClass}`);
+      if (message) message.remove();
+      return;
+    }
+
+    const container = field.closest('.field-wrap') || field.parentElement;
+    const message = container?.querySelector(`.${invalidLabelClass}`);
+    if (message) message.remove();
+  };
+
+  const showFieldError = (field) => {
+    if (!field) return;
+    field.classList.add(invalidClass);
+
+    if (field.type === 'checkbox') {
+      const container = field.closest('.consent-row');
+      if (!container || container.querySelector(`.${invalidLabelClass}`)) return;
+      const message = document.createElement('div');
+      message.className = invalidLabelClass;
+      message.textContent = requiredMessageText;
+      container.append(message);
+      return;
+    }
+
+    const container = field.closest('.field-wrap') || field.parentElement;
+    if (!container || container.querySelector(`.${invalidLabelClass}`)) return;
+    const message = document.createElement('div');
+    message.className = invalidLabelClass;
+    message.textContent = requiredMessageText;
+    container.append(message);
+  };
+
+  [innField, contactField, phoneField, emailField, consentField].forEach((field) => {
+    if (!field) return;
+    const eventName = field.type === 'checkbox' ? 'change' : 'input';
+    field.addEventListener(eventName, () => {
+      if (field.type === 'checkbox' ? field.checked : field.value.trim()) clearFieldError(field);
+    });
+  });
 
   const allowedFileTypes = ['pdf', 'xls', 'xlsx', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'zip'];
   let attachedFiles = [];
@@ -1522,15 +1574,40 @@ const initLeadForm = () => {
     trackEvent('lead_form_start', { scenario: scenarioField?.value || '' });
 
     const errors = [];
+    [innField, contactField, phoneField, emailField, consentField].forEach(clearFieldError);
+
     const phoneDigits = (phoneField?.value || '').replace(/\D/g, '');
     const emailValue = (emailField?.value || '').trim();
-    if (!contactField?.value.trim()) errors.push('Укажите контактное лицо');
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!innField?.value.trim()) {
+      errors.push('Укажите ИНН компании');
+      showFieldError(innField);
+    }
+    if (!contactField?.value.trim()) {
+      errors.push('Укажите контактное лицо');
+      showFieldError(contactField);
+    }
+    if (!phoneField?.value.trim()) {
+      errors.push('Укажите телефон');
+      showFieldError(phoneField);
+    } else if (phoneDigits.length < 11) {
+      errors.push('Проверьте номер телефона');
+      showFieldError(phoneField);
+    }
+    if (!emailValue) {
+      errors.push('Укажите email');
+      showFieldError(emailField);
+    } else if (!emailPattern.test(emailValue)) {
+      errors.push('Проверьте email');
+      showFieldError(emailField);
+    }
     if (!scenarioField?.value) errors.push('Выберите тип обращения');
-    if (!phoneDigits && !emailValue) errors.push('Нужен телефон или email');
-    if (phoneDigits && phoneDigits.length < 11) errors.push('Проверьте номер телефона');
-    if (emailValue && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) errors.push('Проверьте email');
     if ((!commentField?.value || commentField.value.trim().length < 10) && getRequestItems().length === 0) errors.push('Добавьте описание задачи или позиции');
-    if (!consentField?.checked) errors.push('Нужно согласие на обработку данных');
+    if (!consentField?.checked) {
+      errors.push('Нужно согласие на обработку данных');
+      showFieldError(consentField);
+    }
 
     if (errors.length) {
       if (status) status.textContent = errors.join(' · ');
