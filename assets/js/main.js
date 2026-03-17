@@ -1449,6 +1449,27 @@ const initRequestWidget = () => {
 };
 
 
+
+
+const resolveLeadEndpoint = (rawEndpoint = '/api/leads') => {
+  if (!rawEndpoint) return '/api/leads';
+
+  try {
+    const resolved = new URL(rawEndpoint, window.location.href);
+    const isLocalHost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+    const isRelativeApi = rawEndpoint.startsWith('/');
+    const isNotBackendPort = window.location.port && window.location.port !== '8080';
+
+    if (isLocalHost && isRelativeApi && isNotBackendPort) {
+      return `${window.location.protocol}//${window.location.hostname}:8080${rawEndpoint}`;
+    }
+
+    return resolved.toString();
+  } catch (error) {
+    return rawEndpoint;
+  }
+};
+
 const initSimpleLeadForms = () => {
   const forms = Array.from(document.querySelectorAll('[data-simple-lead-form]'));
   if (!forms.length) return;
@@ -1483,9 +1504,10 @@ const initSimpleLeadForms = () => {
 
       if (submitButton) submitButton.disabled = true;
       try {
-        const response = await fetch(form.dataset.endpoint || '/api/leads', { method: 'POST', body: formData });
+        const endpoint = resolveLeadEndpoint(form.dataset.endpoint || '/api/leads');
+        const response = await fetch(endpoint, { method: 'POST', body: formData });
         const payload = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error((payload.details || []).join(' · ') || payload.error || 'Ошибка отправки');
+        if (!response.ok) throw new Error((payload.details || []).join(' · ') || payload.error || (response.status === 501 ? 'Backend не запущен: запустите python backend/server.py на порту 8080.' : 'Ошибка отправки'));
         window.location.href = 'success.html';
       } catch (error) {
         if (status) {
@@ -1679,11 +1701,11 @@ const initLeadForm = () => {
     formData.append('submittedAt', new Date().toISOString());
     attachedFiles.forEach((file) => formData.append('files', file));
 
-    const endpoint = form.dataset.endpoint || '/api/leads';
+    const endpoint = resolveLeadEndpoint(form.dataset.endpoint || '/api/leads');
     try {
       const response = await fetch(endpoint, { method: 'POST', body: formData });
       const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error((payload.details || []).join(' · ') || payload.error || 'Submit failed');
+      if (!response.ok) throw new Error((payload.details || []).join(' · ') || payload.error || (response.status === 501 ? 'Backend не запущен: запустите python backend/server.py на порту 8080.' : 'Submit failed'));
       if (status) status.textContent = 'Спасибо! Заявка отправлена. Мы свяжемся с вами в ближайшее время.';
       form.reset();
       attachedFiles = [];
