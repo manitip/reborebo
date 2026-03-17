@@ -1364,6 +1364,30 @@ const trackEvent = (eventName, params = {}) => {
 };
 
 const initUnifiedCta = () => {
+  const isFileProtocol = window.location.protocol === 'file:';
+  const pageSource = isFileProtocol
+    ? (window.location.pathname.split('/').pop() || 'index.html')
+    : window.location.pathname;
+
+  const buildScenarioHref = (rawHref, scenario) => {
+    const fallback = `contacts.html?scenario=${encodeURIComponent(scenario)}&source=${encodeURIComponent(pageSource)}#request`;
+    if (!rawHref) return fallback;
+
+    try {
+      const resolved = new URL(rawHref, window.location.href);
+      const targetPath = resolved.protocol === 'file:'
+        ? (resolved.pathname.split('/').pop() || 'contacts.html')
+        : (resolved.pathname || 'contacts.html');
+
+      resolved.searchParams.set('scenario', scenario);
+      resolved.searchParams.set('source', pageSource);
+
+      return `${targetPath}${resolved.search}${resolved.hash || '#request'}`;
+    } catch {
+      return fallback;
+    }
+  };
+
   const inferScenario = (text = '') => {
     const normalized = text.toLowerCase();
     if (normalized.includes('кп') || normalized.includes('цен')) return 'quote';
@@ -1375,10 +1399,7 @@ const initUnifiedCta = () => {
     const scenario = cta.dataset.scenarioCta || inferScenario(cta.textContent || '');
     cta.dataset.scenarioCta = scenario;
     if (cta.tagName === 'A') {
-      const url = new URL(cta.getAttribute('href'), window.location.origin);
-      url.searchParams.set('scenario', scenario);
-      url.searchParams.set('source', window.location.pathname);
-      cta.setAttribute('href', `${url.pathname}${url.search}${url.hash || '#request'}`);
+      cta.setAttribute('href', buildScenarioHref(cta.getAttribute('href'), scenario));
     }
   });
 
@@ -1390,12 +1411,12 @@ const initUnifiedCta = () => {
 
   const bar = document.createElement('div');
   bar.className = 'mobile-cta-bar';
-  bar.innerHTML = scenarios.map((item) => `<a class="btn btn-primary btn-sm" href="contacts.html?scenario=${item.key}&source=${encodeURIComponent(window.location.pathname)}#request" data-scenario-cta="${item.key}">${item.label}</a>`).join('');
+  bar.innerHTML = scenarios.map((item) => `<a class="btn btn-primary btn-sm" href="contacts.html?scenario=${encodeURIComponent(item.key)}&source=${encodeURIComponent(pageSource)}#request" data-scenario-cta="${item.key}">${item.label}</a>`).join('');
   document.body.append(bar);
 
   document.querySelectorAll('[data-scenario-cta]').forEach((link) => {
     link.addEventListener('click', () => {
-      trackEvent(`click_cta_${link.dataset.scenarioCta}`, { source_page: window.location.pathname });
+      trackEvent(`click_cta_${link.dataset.scenarioCta}`, { source_page: pageSource });
     });
   });
 };
